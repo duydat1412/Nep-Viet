@@ -5,13 +5,32 @@
     "group": "ao_ngu_than",
     "name_vi": "Áo ngũ thân tay chẽn xanh trầm",
     "gender": "nam",
-    "colors": [{"name": "xanh_cham", "hex": "#26466D"}],
+    "colors": [
+      {
+        "name": "xanh_cham",
+        "hex": "#26466D"
+      }
+    ],
     "formality": 4,
-    "occasions": ["di_le", "ky_yeu", "dao_pho", "tet"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["kin_dao", "mau_tram"],
+    "occasions": [
+      "di_le",
+      "ky_yeu",
+      "dao_pho",
+      "tet"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao",
+      "mau_tram"
+    ],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
-    "source_ids": ["N1"],
+    "source_ids": [
+      "N1"
+    ],
     "status": "draft",
     "brand": {
       "name": "Ỷ Vân Hiên",
@@ -22,7 +41,11 @@
     "pricing": {
       "buy_price": 3450000,
       "rental_price": 350000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~3.1M – 4.0M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Lụa tơ tằm dệt hoa mây thủ công",
     "craftsmanship_lore": "May thủ công phom áo năm thân tay chẽn thời Nguyễn, cài 5 khuy đồng đúc tượng trưng cho Ngũ thường."
@@ -33,13 +56,31 @@
     "group": "ao_ngu_than",
     "name_vi": "Quần lụa trắng ống suông",
     "gender": "unisex",
-    "colors": [{"name": "trang_nga", "hex": "#F8F9FA"}],
+    "colors": [
+      {
+        "name": "trang_nga",
+        "hex": "#F8F9FA"
+      }
+    ],
     "formality": 3,
-    "occasions": ["di_le", "ky_yeu", "tet", "dao_pho"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["kin_dao"],
+    "occasions": [
+      "di_le",
+      "ky_yeu",
+      "tet",
+      "dao_pho"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao"
+    ],
     "asset": "/assets/items/quan_trang_01.png",
-    "source_ids": ["N1"],
+    "source_ids": [
+      "N1"
+    ],
     "status": "draft",
     "brand": {
       "name": "Hợp Tác Xã Lụa Vạn Phúc",
@@ -50,7 +91,11 @@
     "pricing": {
       "buy_price": 1200000,
       "rental_price": 150000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~1.1M – 1.4M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Lụa tơ tằm ngà mộc tự nhiên",
     "craftsmanship_lore": "Ống suông rộng tạo độ rủ sóng sánh khi di chuyển, dệt từ sợi tơ tằm nguyên bản không nhuộm hóa chất."
@@ -61,13 +106,28 @@
     "group": "phu_kien",
     "name_vi": "Guốc mộc quai gấm",
     "gender": "unisex",
-    "colors": [{"name": "go_nau", "hex": "#5D4037"}],
+    "colors": [
+      {
+        "name": "go_nau",
+        "hex": "#5D4037"
+      }
+    ],
     "formality": 3,
-    "occasions": ["di_le", "tet"],
-    "style_levels": ["truyen_thong"],
-    "tags": ["co_dien", "kin_dao"],
+    "occasions": [
+      "di_le",
+      "tet"
+    ],
+    "style_levels": [
+      "truyen_thong"
+    ],
+    "tags": [
+      "co_dien",
+      "kin_dao"
+    ],
     "asset": "/assets/items/guoc_moc_01.png",
-    "source_ids": ["N1"],
+    "source_ids": [
+      "N1"
+    ],
     "status": "draft",
     "brand": {
       "name": "Xưởng Guốc Mộc Bạch Đằng",
@@ -77,7 +137,11 @@
     "pricing": {
       "buy_price": 450000,
       "rental_price": 60000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~0.4M – 0.5M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Gỗ xoan đào tự nhiên, quai gấm dệt chỉ vàng",
     "craftsmanship_lore": "Đế guốc đẽo thủ công gọt lượn theo vòm bàn chân, đóng đinh tán đồng chắc chắn."
@@ -88,11 +152,24 @@
     "group": "phu_kien",
     "name_vi": "Sneaker trắng tối giản",
     "gender": "unisex",
-    "colors": [{"name": "trang", "hex": "#FFFFFF"}],
+    "colors": [
+      {
+        "name": "trang",
+        "hex": "#FFFFFF"
+      }
+    ],
     "formality": 1,
-    "occasions": ["dao_pho", "di_le"],
-    "style_levels": ["phoi_hien_dai"],
-    "tags": ["hien_dai", "phu_kien_duong_pho"],
+    "occasions": [
+      "dao_pho",
+      "di_le"
+    ],
+    "style_levels": [
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "hien_dai",
+      "phu_kien_duong_pho"
+    ],
     "asset": "/assets/items/sneaker_trang_01.png",
     "source_ids": [],
     "status": "draft",
@@ -104,7 +181,11 @@
     "pricing": {
       "buy_price": 650000,
       "rental_price": 0,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": false,
+      "reference_range": "~0.6M – 0.7M ₫",
+      "contact_for_quote": false,
+      "note": "Giá bán lẻ thị trường phụ kiện đại chúng."
     },
     "material": "Vải Canvas & đế cao su lưu hóa",
     "craftsmanship_lore": "Đôi giày thể thao năng động giúp người trẻ thoải mái sải bước khi kết hợp cùng cổ phục dạo phố."
@@ -115,11 +196,25 @@
     "group": "phu_kien",
     "name_vi": "Túi canvas ngà mộc",
     "gender": "unisex",
-    "colors": [{"name": "kem", "hex": "#EFE8DC"}],
+    "colors": [
+      {
+        "name": "kem",
+        "hex": "#EFE8DC"
+      }
+    ],
     "formality": 1,
-    "occasions": ["dao_pho", "di_le"],
-    "style_levels": ["cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["hien_dai", "phu_kien_duong_pho"],
+    "occasions": [
+      "dao_pho",
+      "di_le"
+    ],
+    "style_levels": [
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "hien_dai",
+      "phu_kien_duong_pho"
+    ],
     "asset": "/assets/items/tote_kem_01.png",
     "source_ids": [],
     "status": "draft",
@@ -131,7 +226,11 @@
     "pricing": {
       "buy_price": 180000,
       "rental_price": 0,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": false,
+      "reference_range": "~0.2M – 0.2M ₫",
+      "contact_for_quote": false,
+      "note": "Giá bán lẻ thị trường phụ kiện đại chúng."
     },
     "material": "Vải bố dệt sợi thô tự nhiên",
     "craftsmanship_lore": "Túi tote trơn phom rộng tiện dụng, đựng vừa máy ảnh và vật dụng cá nhân cho những buổi chụp kỷ yếu."
@@ -142,13 +241,32 @@
     "group": "ao_ngu_than",
     "name_vi": "Áo ngũ thân nữ tay chẽn hoàng cúc",
     "gender": "nu",
-    "colors": [{"name": "vang_hoang_cuc", "hex": "#FDC668"}],
+    "colors": [
+      {
+        "name": "vang_hoang_cuc",
+        "hex": "#FDC668"
+      }
+    ],
     "formality": 4,
-    "occasions": ["di_le", "ky_yeu", "dao_pho", "tet"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["kin_dao", "mau_tuoi"],
+    "occasions": [
+      "di_le",
+      "ky_yeu",
+      "dao_pho",
+      "tet"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao",
+      "mau_tuoi"
+    ],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
-    "source_ids": ["N1"],
+    "source_ids": [
+      "N1"
+    ],
     "status": "draft",
     "brand": {
       "name": "Ỷ Vân Hiên",
@@ -159,7 +277,11 @@
     "pricing": {
       "buy_price": 3200000,
       "rental_price": 350000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~2.9M – 3.7M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Lụa sa Lã Khê dệt hoa cúc cài",
     "craftsmanship_lore": "Phom áo ngũ thân nữ may đo tôn eo thon thả, năm thân cài khuy đồng bọc ngọc trang nhã."
@@ -170,13 +292,33 @@
     "group": "ao_tac",
     "name_vi": "Áo tấc nam tay thụng lam sẫm",
     "gender": "nam",
-    "colors": [{"name": "xanh_cham", "hex": "#26466D"}],
+    "colors": [
+      {
+        "name": "xanh_cham",
+        "hex": "#26466D"
+      }
+    ],
     "formality": 4,
-    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["kin_dao", "tay_thung"],
+    "occasions": [
+      "di_le",
+      "tet",
+      "dao_pho",
+      "ky_yeu"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao",
+      "tay_thung"
+    ],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
-    "source_ids": ["N1", "S_VJOL_CUNGDINH"],
+    "source_ids": [
+      "N1",
+      "S_VJOL_CUNGDINH"
+    ],
     "status": "draft",
     "brand": {
       "name": "Ỷ Vân Hiên",
@@ -185,7 +327,11 @@
     "pricing": {
       "buy_price": 3800000,
       "rental_price": 400000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~3.4M – 4.4M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Lụa gấm Vạn Phúc hoa văn chữ Thọ",
     "craftsmanship_lore": "Lễ phục tay thụng rộng xẻ tà phóng khoáng của triều Nguyễn."
@@ -196,13 +342,33 @@
     "group": "ao_tac",
     "name_vi": "Áo tấc nữ tay thụng hồng đào",
     "gender": "nu",
-    "colors": [{"name": "hong_sen", "hex": "#E8909C"}],
+    "colors": [
+      {
+        "name": "hong_sen",
+        "hex": "#E8909C"
+      }
+    ],
     "formality": 4,
-    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["kin_dao", "tay_thung"],
+    "occasions": [
+      "di_le",
+      "tet",
+      "dao_pho",
+      "ky_yeu"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao",
+      "tay_thung"
+    ],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
-    "source_ids": ["N1", "S_VJOL_CUNGDINH"],
+    "source_ids": [
+      "N1",
+      "S_VJOL_CUNGDINH"
+    ],
     "status": "draft",
     "brand": {
       "name": "Cổ Phục Hoa Niên",
@@ -211,7 +377,11 @@
     "pricing": {
       "buy_price": 3600000,
       "rental_price": 380000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~3.2M – 4.1M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Gấm dệt tơ tằm thêu viền hoa sen",
     "craftsmanship_lore": "Tay thụng dài buông mềm mại, mang nét quý phái của cung đình Huế."
@@ -222,13 +392,31 @@
     "group": "ao_dai",
     "name_vi": "Áo dài nam truyền thống xanh lục",
     "gender": "nam",
-    "colors": [{"name": "xanh_luc", "hex": "#2E5339"}],
+    "colors": [
+      {
+        "name": "xanh_luc",
+        "hex": "#2E5339"
+      }
+    ],
     "formality": 3,
-    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["kin_dao"],
+    "occasions": [
+      "di_le",
+      "tet",
+      "dao_pho",
+      "ky_yeu"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao"
+    ],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
-    "source_ids": ["N1"],
+    "source_ids": [
+      "N1"
+    ],
     "status": "draft",
     "brand": {
       "name": "Áo Dài Thăng Long",
@@ -237,7 +425,11 @@
     "pricing": {
       "buy_price": 2500000,
       "rental_price": 280000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~2.3M – 2.9M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Lụa gấm Hà Đông dệt họa tiết mây",
     "craftsmanship_lore": "Cổ đứng hai phân thanh nhã, tôn vẻ trang trọng của nam nhi."
@@ -248,13 +440,31 @@
     "group": "ao_dai",
     "name_vi": "Áo dài nữ truyền thống trắng ngà",
     "gender": "nu",
-    "colors": [{"name": "trang_nga", "hex": "#F8F9FA"}],
+    "colors": [
+      {
+        "name": "trang_nga",
+        "hex": "#F8F9FA"
+      }
+    ],
     "formality": 3,
-    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
-    "tags": ["kin_dao"],
+    "occasions": [
+      "di_le",
+      "tet",
+      "dao_pho",
+      "ky_yeu"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao"
+    ],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
-    "source_ids": ["N1"],
+    "source_ids": [
+      "N1"
+    ],
     "status": "draft",
     "brand": {
       "name": "Áo Dài Liên Hương",
@@ -263,7 +473,11 @@
     "pricing": {
       "buy_price": 2600000,
       "rental_price": 300000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~2.3M – 3.0M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Lụa tơ tằm Vạn Phúc dệt hoa chìm",
     "craftsmanship_lore": "Tà áo dài thướt tha mềm rủ, phom dáng cổ điển tôn nét duyên Việt."
@@ -274,13 +488,30 @@
     "group": "ao_tu_than",
     "name_vi": "Áo tứ thân nữ Kinh Bắc",
     "gender": "nu",
-    "colors": [{"name": "nau_song", "hex": "#5D4037"}],
+    "colors": [
+      {
+        "name": "nau_song",
+        "hex": "#5D4037"
+      }
+    ],
     "formality": 3,
-    "occasions": ["di_le", "dao_pho", "bieu_dien"],
-    "style_levels": ["truyen_thong", "cach_tan_nhe"],
-    "tags": ["kin_dao"],
+    "occasions": [
+      "di_le",
+      "dao_pho",
+      "bieu_dien"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe"
+    ],
+    "tags": [
+      "kin_dao"
+    ],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
-    "source_ids": ["S_BTHN_TUTHAN", "S_VINWONDERS_QUANHO"],
+    "source_ids": [
+      "S_BTHN_TUTHAN",
+      "S_VINWONDERS_QUANHO"
+    ],
     "status": "draft",
     "brand": {
       "name": "Tiệm Cổ Phong Kinh Bắc",
@@ -289,7 +520,11 @@
     "pricing": {
       "buy_price": 2800000,
       "rental_price": 320000,
-      "currency": "VND"
+      "currency": "VND",
+      "is_estimate": true,
+      "reference_range": "~2.5M – 3.2M ₫",
+      "contact_for_quote": true,
+      "note": "Mức giá tham khảo khảo sát từ các xưởng may thủ công. Chi phí thực tế tùy thuộc vào chất liệu gấm/lụa lựa chọn và họa tiết may đo theo số đo riêng."
     },
     "material": "Vải đũi thô nhuộm củ nâu truyền thống",
     "craftsmanship_lore": "Bốn vạt áo mộc mạc biểu trưng cho bốn đức tính tốt đẹp của phụ nữ Việt."

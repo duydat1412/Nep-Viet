@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import ExportButton from "./ExportButton";
-import { Store, Tag, Sparkles } from "lucide-react";
+import { Store, Tag, Sparkles, ExternalLink, Phone } from "lucide-react";
 import { getSourceShortName, getSlotName, getGroupName } from "@/lib/constants/sources";
 
 export interface ComboResult {
@@ -159,8 +159,8 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
                   {topItem.name_vi || topItem.name}
                 </span>
                 {topItem.pricing?.buy_price ? (
-                  <span className="text-[9px] font-mono font-bold text-nep-gold border-l border-nep-ink/10 pl-1.5">
-                    {topItem.pricing.buy_price.toLocaleString()}₫
+                  <span className="text-[9px] font-mono font-bold text-nep-gold border-l border-nep-ink/10 pl-1.5" title={topItem.pricing?.is_estimate ? "Giá tham khảo may đo" : "Giá bán lẻ"}>
+                    {topItem.pricing.is_estimate ? "~" : ""}{topItem.pricing.buy_price.toLocaleString()}₫{topItem.pricing.is_estimate ? "*" : ""}
                   </span>
                 ) : null}
               </div>
@@ -183,8 +183,8 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
                   {bottomItem.name_vi || bottomItem.name}
                 </span>
                 {bottomItem.pricing?.buy_price ? (
-                  <span className="text-[9px] font-mono font-bold text-nep-gold border-l border-nep-ink/10 pl-1.5">
-                    {bottomItem.pricing.buy_price.toLocaleString()}₫
+                  <span className="text-[9px] font-mono font-bold text-nep-gold border-l border-nep-ink/10 pl-1.5" title={bottomItem.pricing?.is_estimate ? "Giá tham khảo may đo" : "Giá bán lẻ"}>
+                    {bottomItem.pricing.is_estimate ? "~" : ""}{bottomItem.pricing.buy_price.toLocaleString()}₫{bottomItem.pricing.is_estimate ? "*" : ""}
                   </span>
                 ) : null}
               </div>
@@ -207,8 +207,8 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
                   {footwearItem.name_vi || footwearItem.name}
                 </span>
                 {footwearItem.pricing?.buy_price ? (
-                  <span className="text-[9px] font-mono font-bold text-nep-gold border-l border-nep-ink/10 pl-1.5">
-                    {footwearItem.pricing.buy_price.toLocaleString()}₫
+                  <span className="text-[9px] font-mono font-bold text-nep-gold border-l border-nep-ink/10 pl-1.5" title={footwearItem.pricing?.is_estimate ? "Giá tham khảo" : "Giá bán lẻ"}>
+                    {footwearItem.pricing.is_estimate ? "~" : ""}{footwearItem.pricing.buy_price.toLocaleString()}₫{footwearItem.pricing.is_estimate ? "*" : ""}
                   </span>
                 ) : null}
               </div>
@@ -346,21 +346,79 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
               )}
 
               {selectedItem.pricing && (
-                <div className="p-2.5 rounded-lg bg-nep-paper/50 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] text-nep-ink/50 block">Giá tham khảo</span>
-                    {selectedItem.pricing.rental_price ? (
-                      <span className="font-bold text-nep-indigo block">
-                        Thuê: {selectedItem.pricing.rental_price.toLocaleString()}₫
+                <div className="p-3 rounded-xl bg-nep-paper/60 border border-nep-ink/10 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Tag className="w-3.5 h-3.5 text-nep-gold" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-nep-ink/70">
+                        {selectedItem.pricing.is_estimate ? "Khoảng giá tham khảo may đo" : "Mức giá niêm yết"}
                       </span>
-                    ) : null}
+                    </div>
+                    {selectedItem.pricing.is_estimate && (
+                      <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-mono font-bold">
+                        Khảo sát thị trường
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs pt-0.5">
                     {selectedItem.pricing.buy_price ? (
-                      <span className="font-bold text-nep-red block">
-                        May: {selectedItem.pricing.buy_price.toLocaleString()}₫
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-[11px] text-nep-ink/60">May/Mua:</span>
+                        <span className="font-bold text-nep-red text-sm font-mono">
+                          {selectedItem.pricing.is_estimate ? "~" : ""}{selectedItem.pricing.buy_price.toLocaleString()}₫
+                        </span>
+                      </div>
+                    ) : null}
+
+                    {selectedItem.pricing.reference_range && (
+                      <span className="text-[11px] text-nep-ink/60 font-mono">
+                        (Phổ thông: {selectedItem.pricing.reference_range})
                       </span>
+                    )}
+
+                    {selectedItem.pricing.rental_price ? (
+                      <div className="flex items-baseline gap-1 border-l border-nep-ink/10 pl-2">
+                        <span className="text-[11px] text-nep-ink/60">Thuê:</span>
+                        <span className="font-bold text-nep-indigo font-mono">
+                          ~{selectedItem.pricing.rental_price.toLocaleString()}₫/ngày
+                        </span>
+                      </div>
                     ) : null}
                   </div>
-                  <Tag className="w-4 h-4 text-nep-gold" />
+
+                  {selectedItem.pricing.note && (
+                    <p className="text-[10px] text-nep-ink/60 leading-relaxed italic pt-1 border-t border-nep-ink/5">
+                      *{selectedItem.pricing.note}
+                    </p>
+                  )}
+
+                  {/* Nút liên hệ nhà may trực tiếp */}
+                  {(selectedItem.brand?.url || selectedItem.brand?.contact) && (
+                    <div className="pt-2 flex items-center gap-2">
+                      {selectedItem.brand.url && (
+                        <a
+                          href={selectedItem.brand.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 py-1.5 px-3 rounded-lg bg-nep-red/10 hover:bg-nep-red/15 text-nep-red font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>Liên hệ nhà may để nhận báo giá</span>
+                        </a>
+                      )}
+                      {selectedItem.brand.contact && (
+                        <a
+                          href={`tel:${selectedItem.brand.contact.replace(/\s+/g, '')}`}
+                          className="py-1.5 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container text-nep-ink font-semibold text-[11px] flex items-center gap-1 transition-colors"
+                          title={`Hotline: ${selectedItem.brand.contact}`}
+                        >
+                          <Phone className="w-3 h-3 text-secondary" />
+                          <span className="font-mono text-[10px]">{selectedItem.brand.contact}</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 

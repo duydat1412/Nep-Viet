@@ -24,7 +24,11 @@ export const BrandSchema = z.object({
 export const PricingSchema = z.object({
   buy_price: z.number().optional(),
   rental_price: z.number().optional(),
-  currency: z.string().default('VND')
+  currency: z.string().default('VND'),
+  is_estimate: z.boolean().optional(),
+  reference_range: z.string().optional(),
+  contact_for_quote: z.boolean().optional(),
+  note: z.string().optional()
 });
 
 export const ItemSchema = z.object({

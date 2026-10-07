@@ -32,14 +32,22 @@ export default function LookbookCard({ result }: LookbookCardProps) {
 
   const badge = badgeConfig[result.muc_canh_bao] || badgeConfig.CHUA_DU_CAN_CU;
 
+  // Sắp xếp items theo thứ tự trục cơ thể: Áo -> Quần -> Giày & Phụ kiện
+  const topItem = result.items?.find((i: any) => i.slot === "top");
+  const bottomItem = result.items?.find((i: any) => i.slot === "bottom");
+  const footwearItem = result.items?.find((i: any) => i.slot === "footwear");
+  const accessories = result.items?.filter(
+    (i: any) => !["top", "bottom", "footwear"].includes(i.slot)
+  ) || [];
+
   return (
     <div className="flex flex-col items-center">
       <div 
         ref={cardRef} 
-        className="relative bg-nep-paper w-[360px] min-h-[640px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-6"
+        className="relative bg-nep-paper w-[360px] min-h-[660px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-5"
       >
         {/* Header */}
-        <div className="text-center mb-3">
+        <div className="text-center mb-2">
           <h2 className="font-heading text-2xl font-bold text-nep-red tracking-wider">NẾP VIỆT</h2>
           <p className="text-[10px] text-nep-ink/60 uppercase tracking-widest mt-0.5">Nếp Việt, nét riêng.</p>
         </div>
@@ -52,26 +60,73 @@ export default function LookbookCard({ result }: LookbookCardProps) {
           </span>
         </div>
 
-        {/* Outfit Breakdown Grid */}
-        <div className="grid grid-cols-2 gap-2.5 mb-3 flex-1">
-          {result.items?.map((item: any, idx: number) => {
-            const imgSrc = item.image_url || item.asset;
-            const name = item.name_vi || item.name;
+        {/* Body Lineup Layout (Áo -> Quần -> Giày theo trục đứng) */}
+        <div className="relative bg-white/75 rounded-2xl p-3 border border-nep-ink/5 shadow-sm mb-3 flex flex-col items-center">
+          {/* Phụ kiện nổi ở góc (nếu có, e.g. Túi tote) */}
+          {accessories.map((acc: any, idx: number) => {
+            const accImg = acc.image_url || acc.asset;
+            const accName = acc.name_vi || acc.name;
             return (
-              <div key={idx} className="bg-white/70 rounded-xl p-2 flex flex-col items-center justify-center shadow-sm border border-nep-ink/5">
-                {imgSrc ? (
-                  <img src={imgSrc} alt={name} className="w-full h-24 object-contain mb-1 drop-shadow-sm" />
-                ) : (
-                  <div className="w-full h-24 bg-gray-100 rounded mb-1 flex items-center justify-center text-gray-400 text-xs">No image</div>
+              <div 
+                key={idx}
+                className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-xl p-1.5 shadow-md border border-nep-ink/10 flex flex-col items-center z-10 max-w-[76px]"
+              >
+                <span className="text-[8px] uppercase tracking-wider font-semibold text-nep-indigo mb-0.5">Phụ kiện</span>
+                {accImg && (
+                  <img src={accImg} alt={accName} className="w-12 h-12 object-contain drop-shadow-sm" />
                 )}
-                <span className="text-[10px] text-center font-medium leading-tight text-nep-ink line-clamp-1">{name}</span>
+                <span className="text-[8px] text-center font-medium text-nep-ink leading-tight line-clamp-1 mt-0.5">
+                  {accName}
+                </span>
               </div>
             );
           })}
+
+          {/* 1. Áo chính (Top) */}
+          {topItem && (
+            <div className="flex flex-col items-center w-full group -mb-3 z-0">
+              <img 
+                src={topItem.image_url || topItem.asset} 
+                alt={topItem.name_vi || topItem.name} 
+                className="h-36 w-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
+              />
+              <span className="text-[10px] font-semibold text-nep-ink/80 bg-white/80 px-2 py-0.5 rounded-full border border-nep-ink/5 shadow-2xs mt-0.5">
+                {topItem.name_vi || topItem.name}
+              </span>
+            </div>
+          )}
+
+          {/* 2. Quần (Bottom) */}
+          {bottomItem && (
+            <div className="flex flex-col items-center w-full group -mb-2 z-0">
+              <img 
+                src={bottomItem.image_url || bottomItem.asset} 
+                alt={bottomItem.name_vi || bottomItem.name} 
+                className="h-32 w-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
+              />
+              <span className="text-[10px] font-semibold text-nep-ink/80 bg-white/80 px-2 py-0.5 rounded-full border border-nep-ink/5 shadow-2xs mt-0.5">
+                {bottomItem.name_vi || bottomItem.name}
+              </span>
+            </div>
+          )}
+
+          {/* 3. Giày / Guốc (Footwear) */}
+          {footwearItem && (
+            <div className="flex flex-col items-center w-full group mt-1 z-0">
+              <img 
+                src={footwearItem.image_url || footwearItem.asset} 
+                alt={footwearItem.name_vi || footwearItem.name} 
+                className="h-16 w-full object-contain drop-shadow-md hover:scale-105 transition-transform duration-300"
+              />
+              <span className="text-[10px] font-semibold text-nep-ink/80 bg-white/80 px-2 py-0.5 rounded-full border border-nep-ink/5 shadow-2xs mt-1">
+                {footwearItem.name_vi || footwearItem.name}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Score Bar */}
-        <div className="mb-3 bg-white/50 p-2.5 rounded-xl border border-nep-ink/5">
+        <div className="mb-2.5 bg-white/50 p-2.5 rounded-xl border border-nep-ink/5">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[11px] font-medium text-nep-ink/80">Điểm hài hòa màu sắc</span>
             <span className="text-xs font-bold text-nep-gold">{result.diem_hai_hoa_mau} / 10</span>
@@ -88,7 +143,7 @@ export default function LookbookCard({ result }: LookbookCardProps) {
         </div>
 
         {/* Cultural Explanation */}
-        <div className="bg-white/60 p-3 rounded-xl border border-nep-ink/5 mb-2.5">
+        <div className="bg-white/60 p-2.5 rounded-xl border border-nep-ink/5 mb-2">
           <p className="text-[11px] leading-relaxed text-nep-ink/90 italic">
             "{result.dien_giai_van_hoa || result.ly_do_phoi_do}"
           </p>
@@ -96,7 +151,7 @@ export default function LookbookCard({ result }: LookbookCardProps) {
 
         {/* Warning Details for VANG */}
         {result.muc_canh_bao === "VANG" && result.triggered_rules?.length > 0 && (
-          <div className="bg-amber-50 p-2.5 rounded-xl border border-amber-200 mb-2.5">
+          <div className="bg-amber-50 p-2.5 rounded-xl border border-amber-200 mb-2">
             <p className="text-[10px] text-amber-900 leading-tight">
               <span className="font-bold">⚠️ Lưu ý văn hóa:</span>{" "}
               {typeof result.triggered_rules[0] === "string"
@@ -119,7 +174,7 @@ export default function LookbookCard({ result }: LookbookCardProps) {
         )}
       </div>
 
-      <div className="mt-5 w-full max-w-[360px] flex justify-center">
+      <div className="mt-4 w-full max-w-[360px] flex justify-center">
         <ExportButton cardRef={cardRef} comboId={result.combo_id} />
       </div>
     </div>

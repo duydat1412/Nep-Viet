@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import ExportButton from "./ExportButton";
 import { Store, Tag, Sparkles } from "lucide-react";
+import { getSourceShortName, getSlotName, getGroupName } from "@/lib/constants/sources";
 
 export interface ComboResult {
   combo_id: string;
@@ -285,17 +286,17 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
         {/* Citations */}
         {result.source_ids?.length > 0 && (
           <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-2 border-t border-nep-ink/5">
-            <span className="text-[8px] text-nep-ink/50 uppercase font-semibold">Căn cứ:</span>
+            <span className="text-[8px] text-nep-ink/50 uppercase font-bold tracking-wider">Căn cứ khảo cứu:</span>
             {result.source_ids.map((source: string) => (
               <button
                 key={source}
                 type="button"
                 onClick={() => onOpenSource?.(source)}
-                className="text-[8px] bg-nep-indigo/10 text-nep-indigo hover:bg-nep-indigo hover:text-white px-1.5 py-0.5 rounded font-mono font-bold transition-colors cursor-pointer flex items-center gap-0.5"
-                title={`Tra cứu văn bản / tài liệu căn cứ [${source}]`}
+                className="text-[9px] bg-nep-indigo/10 text-nep-indigo hover:bg-nep-indigo hover:text-white px-2 py-0.5 rounded-full font-medium transition-colors cursor-pointer flex items-center gap-1"
+                title={`Tra cứu văn bản / tài liệu: ${getSourceShortName(source)}`}
               >
-                <span>{source}</span>
-                <span className="text-[7px]">↗</span>
+                <span>{getSourceShortName(source)}</span>
+                <span className="text-[8px] opacity-70">↗</span>
               </button>
             ))}
           </div>
@@ -309,7 +310,7 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
             <div className="flex items-start justify-between mb-3">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-nep-red">
-                  {selectedItem.slot} · {selectedItem.group}
+                  {getSlotName(selectedItem.slot)} · {getGroupName(selectedItem.group)}
                 </span>
                 <h3 className="font-heading text-lg font-bold text-nep-ink">
                   {selectedItem.name_vi || selectedItem.name}

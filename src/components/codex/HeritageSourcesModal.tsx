@@ -16,6 +16,11 @@ import {
 } from "lucide-react";
 import sourcesData from "../../../data/sources.json";
 import rulesData from "../../../data/cultural_rules.json";
+import { 
+  getSourceBadgeLabel, 
+  getSourceCategoryName, 
+  getSourceShortName 
+} from "@/lib/constants/sources";
 
 interface HeritageSourcesModalProps {
   isOpen: boolean;
@@ -130,7 +135,7 @@ export default function HeritageSourcesModal({
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-nep-ink/40" />
             <input
               type="text"
-              placeholder="Tìm theo mã nguồn, tác giả, tiêu đề..."
+              placeholder="Tìm kiếm tài liệu, cơ quan, di tích, chủ đề..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2 rounded-full bg-surface-container-low border border-nep-ink/10 text-xs text-nep-ink focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -184,8 +189,8 @@ export default function HeritageSourcesModal({
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-2.5">
                     <div className="flex items-start gap-2.5">
-                      <span className="font-mono text-xs px-2.5 py-1 rounded-lg bg-nep-indigo/10 text-nep-indigo font-bold shrink-0">
-                        {item.id}
+                      <span className="text-[11px] px-2.5 py-1 rounded-lg bg-nep-indigo/10 text-nep-indigo font-bold shrink-0">
+                        {getSourceBadgeLabel(item.id)}
                       </span>
                       <div>
                         <h3 className="font-heading text-base font-bold text-nep-ink leading-snug">
@@ -235,27 +240,27 @@ export default function HeritageSourcesModal({
                       <div className="flex items-center gap-1.5 mb-2">
                         <Scale className="w-3.5 h-3.5 text-secondary" />
                         <span className="text-[10px] uppercase font-bold tracking-wider text-nep-ink/70">
-                          Quy tắc văn hóa đối chiếu trực tiếp ({item.cited_rules.length} quy tắc):
+                          Quy tắc văn hóa đối chiếu trực tiếp ({item.cited_rules.length} tiêu chuẩn):
                         </span>
                       </div>
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         {item.cited_rules.map((rule: any) => (
-                          <div key={rule.id} className="text-xs flex items-start gap-2">
-                            <span className="font-mono text-[10px] font-bold text-nep-red shrink-0 px-1 rounded bg-nep-red/5">
-                              {rule.id}
+                          <div key={rule.id} className="text-xs flex flex-col gap-0.5">
+                            <span className="font-semibold text-nep-ink">
+                              • {rule.title}
                             </span>
-                            <span className="text-nep-ink/90 font-medium">
-                              {rule.title}: <span className="text-nep-ink/70 font-normal italic">{rule.message_vi}</span>
-                            </span>
+                            <p className="text-[11px] text-nep-ink/75 leading-relaxed italic pl-3">
+                              "{rule.message_vi}"
+                            </p>
                           </div>
                         ))}
                       </div>
                     </div>
                   )}
 
-                  <div className="mt-2.5 flex items-center justify-between text-[10px] text-nep-ink/40 font-mono">
-                    <span>Phân loại: {item.category}</span>
-                    <span>Truy cập thẩm định: {item.accessed}</span>
+                  <div className="mt-2.5 flex items-center justify-between text-[11px] text-nep-ink/55">
+                    <span>Nhóm tư liệu: <strong className="text-nep-ink/80">{getSourceCategoryName(item.id)}</strong></span>
+                    <span>Ngày thẩm định: {item.accessed}</span>
                   </div>
                 </article>
               );

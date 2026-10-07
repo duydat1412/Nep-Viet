@@ -17,8 +17,9 @@ export interface ComboResult {
   items: any[];
 }
 
-interface LookbookCardProps {
+export interface LookbookCardProps {
   result: ComboResult;
+  onOpenSource?: (sourceId: string) => void;
 }
 
 function ExpandableText({
@@ -54,7 +55,7 @@ function ExpandableText({
   );
 }
 
-export default function LookbookCard({ result }: LookbookCardProps) {
+export default function LookbookCard({ result, onOpenSource }: LookbookCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
@@ -85,13 +86,13 @@ export default function LookbookCard({ result }: LookbookCardProps) {
         ref={cardRef} 
         className="relative bg-nep-paper w-[360px] min-h-[690px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-5 transition-all duration-300"
       >
-        {/* Dấu Triện (Imperial Seal Stamp) Accent - Theo Stitch design */}
-        <div className="absolute top-4 right-4 z-20 flex flex-col items-center select-none pointer-events-none">
+        {/* Dấu Triện (Imperial Seal Stamp) Accent - Ước lệ mỹ thuật */}
+        <div className="absolute top-4 right-4 z-20 flex flex-col items-center select-none pointer-events-none" title="Mô phỏng đồ họa ấn triện truyền thống">
           <div className="w-9 h-9 rounded-md bg-nep-red text-white flex flex-col items-center justify-center shadow-md leading-none border border-amber-300/40">
             <span className="font-heading text-[8px] font-black tracking-widest uppercase">NẾP</span>
             <span className="font-heading text-[8px] font-black tracking-widest uppercase mt-0.5">VIỆT</span>
           </div>
-          <span className="text-[7px] uppercase tracking-tighter text-nep-red font-mono mt-0.5 font-bold">NGỰ PHÊ</span>
+          <span className="text-[7px] uppercase tracking-tighter text-nep-red font-mono mt-0.5 font-bold">NẾP PHÊ</span>
         </div>
 
         {/* Header */}
@@ -283,12 +284,19 @@ export default function LookbookCard({ result }: LookbookCardProps) {
 
         {/* Citations */}
         {result.source_ids?.length > 0 && (
-          <div className="mt-auto flex flex-wrap items-center gap-1 pt-1 border-t border-nep-ink/5">
+          <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-2 border-t border-nep-ink/5">
             <span className="text-[8px] text-nep-ink/50 uppercase font-semibold">Căn cứ:</span>
             {result.source_ids.map((source: string) => (
-              <span key={source} className="text-[8px] bg-nep-ink/5 text-nep-ink/70 px-1.5 py-0.5 rounded font-mono">
-                {source}
-              </span>
+              <button
+                key={source}
+                type="button"
+                onClick={() => onOpenSource?.(source)}
+                className="text-[8px] bg-nep-indigo/10 text-nep-indigo hover:bg-nep-indigo hover:text-white px-1.5 py-0.5 rounded font-mono font-bold transition-colors cursor-pointer flex items-center gap-0.5"
+                title={`Tra cứu văn bản / tài liệu căn cứ [${source}]`}
+              >
+                <span>{source}</span>
+                <span className="text-[7px]">↗</span>
+              </button>
             ))}
           </div>
         )}

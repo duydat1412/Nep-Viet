@@ -16,10 +16,12 @@ import {
   Sliders,
   ShieldCheck,
   Eye,
-  Camera
+  Camera,
+  BookOpen
 } from "lucide-react";
 import LookbookCard from "@/components/lookbook/LookbookCard";
 import { LoadingSkeleton, ErrorCard, ChuaDuCanCuCard, FallbackBanner } from "@/components/lookbook/CardStates";
+import HeritageSourcesModal from "@/components/codex/HeritageSourcesModal";
 
 export default function Home() {
   // Styling Studio States
@@ -31,6 +33,10 @@ export default function Home() {
   const [fluiditySlider, setFluiditySlider] = useState(88);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const [activeMode, setActiveMode] = useState("minimalist");
+
+  // Codex & Source References State
+  const [codexOpen, setCodexOpen] = useState(false);
+  const [focusedSourceId, setFocusedSourceId] = useState<string | null>(null);
 
   // Recommendation Result State
   const [loading, setLoading] = useState(false);
@@ -70,7 +76,7 @@ export default function Home() {
       name: "Áo Tấc Đương Đại",
       en: "Wide-Sleeve Imperial Robe",
       desc: "Tay thụng rộng xẻ tà phóng khoáng, khuy cài ngọc bích lệch góc ngũ thân.",
-      era: "Chuẩn Triều Nguyễn · 1789",
+      era: "Triều Nguyễn (1802 – 1945)",
       icon: "checkroom",
       group: "ao_tac"
     },
@@ -79,7 +85,7 @@ export default function Home() {
       name: "Ngũ Thân Tay Chẽn",
       en: "Fitted Mandarin Cut",
       desc: "Năm thân biểu trưng tứ thân phụ mẫu ôm gọn cổ đứng, tay chẽn hiện đại.",
-      era: "Võ Vương Minh Mạng · 1820",
+      era: "Chúa Vũ Vương (1744) & Vua Minh Mạng (1827)",
       icon: "dry_cleaning",
       group: "ao_ngu_than"
     },
@@ -88,7 +94,7 @@ export default function Home() {
       name: "Áo Dài Truyền Thống",
       en: "Heritage Long Tunic",
       desc: "Cổ đứng hai phân thanh nhã, hai tà bay bổng tôn dáng vẻ đoan trang.",
-      era: "Thế Kỷ XIX-XX",
+      era: "Thời Lê Sơ (1428) – TK XIX-XX",
       icon: "styler",
       group: "ao_dai"
     },
@@ -153,6 +159,14 @@ export default function Home() {
             <a className="px-4 py-1.5 rounded-full text-xs font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#lookbook">
               Lookbook Atelier
             </a>
+            <button
+              onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
+              type="button"
+              className="px-4 py-1.5 rounded-full text-xs font-medium text-primary hover:bg-surface-container-high transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Điển Thư Khảo Cứu</span>
+            </button>
             <a className="px-4 py-1.5 rounded-full text-xs font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors" href="/admin/ingest">
               Admin AI Ingest
             </a>
@@ -166,6 +180,15 @@ export default function Home() {
             >
               {audioPlaying ? <Volume2 className="w-3.5 h-3.5 text-secondary animate-pulse" /> : <VolumeX className="w-3.5 h-3.5" />}
               <span>{audioPlaying ? "Đang phát: Lưu Thủy" : "Nhã Nhạc Ambience"}</span>
+            </button>
+
+            <button
+              onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
+              type="button"
+              className="px-3.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container-high font-mono text-[11px] font-bold text-nep-red border border-nep-red/20 flex items-center gap-1 cursor-pointer"
+            >
+              <BookOpen className="w-3 h-3" />
+              <span>Nguồn Tư Liệu</span>
             </button>
 
             <a 
@@ -196,10 +219,16 @@ export default function Home() {
                   Phòng Giám Tuyển Số 04
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 bg-surface-container-high px-3 py-1 rounded-full shadow-2xs">
-                <ShieldCheck className="w-3.5 h-3.5 text-secondary" />
-                <span className="text-[11px] font-semibold text-on-surface">Chứng Nhận Chuẩn Thức Triều Nguyễn</span>
-              </div>
+              <button
+                type="button"
+                onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
+                className="flex items-center gap-1.5 bg-surface-container-high hover:bg-surface-container-highest px-3 py-1 rounded-full shadow-2xs transition-colors cursor-pointer group"
+                title="Nhấn để xem Điển Thư & Danh Mục Nguồn Khảo Cứu"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-secondary group-hover:scale-110 transition-transform" />
+                <span className="text-[11px] font-semibold text-on-surface">Đối Chiếu Điển Chế &amp; Quy Tắc Văn Hóa</span>
+                <span className="text-[10px] text-primary font-mono font-bold">↗</span>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
@@ -406,8 +435,8 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <span className="text-[10px] text-secondary uppercase font-bold block font-mono">Chỉ Số Hài Hòa</span>
-                    <span className="font-heading text-lg text-primary font-bold">98.4%</span>
+                    <span className="text-[10px] text-secondary uppercase font-bold block font-mono">Thước Đo Ngũ Hành</span>
+                    <span className="font-heading text-base font-bold text-primary">Thủy Sinh Mộc · Hòa Hợp</span>
                   </div>
                 </div>
 
@@ -518,6 +547,15 @@ export default function Home() {
                     <Store className="w-4 h-4 text-secondary" />
                     <span>Nạp Sản Phẩm Thật</span>
                   </a>
+
+                  <button
+                    type="button"
+                    onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
+                    className="px-5 py-3.5 rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <BookOpen className="w-4 h-4 text-primary" />
+                    <span>Tra Cứu Điển Thư</span>
+                  </button>
                 </div>
               </article>
             </section>
@@ -537,7 +575,13 @@ export default function Home() {
                 ) : result.phuong_an?.[0] ? (
                   <div className="flex flex-col items-center w-full">
                     <FallbackBanner visible={result.fallback_used} />
-                    <LookbookCard result={result.phuong_an[0]} />
+                    <LookbookCard 
+                      result={result.phuong_an[0]} 
+                      onOpenSource={(srcId) => {
+                        setFocusedSourceId(srcId);
+                        setCodexOpen(true);
+                      }}
+                    />
                   </div>
                 ) : null
               ) : (
@@ -547,6 +591,10 @@ export default function Home() {
                     ✦ BẢN GIÁM TUYỂN MẪU · SẮC CHÀM PHỐ CỔ
                   </div>
                   <LookbookCard
+                    onOpenSource={(srcId) => {
+                      setFocusedSourceId(srcId);
+                      setCodexOpen(true);
+                    }}
                     result={{
                       combo_id: "combo_stitch_editorial",
                       outfit_item_ids: ["ao_ngu_than_nam_xanh_01", "quan_trang_01", "guoc_moc_01"],
@@ -617,7 +665,7 @@ export default function Home() {
                   <div>
                     <span className="text-[9px] text-secondary uppercase font-bold tracking-wider font-mono">Làng Nghề Giám Định</span>
                     <h4 className="font-heading text-sm font-bold text-on-surface">Hợp Tác Xã Dệt Lụa Vạn Phúc</h4>
-                    <p className="text-[11px] text-on-surface-variant">Hà Đông, Hà Nội · Canh cửi từ năm 865</p>
+                    <p className="text-[11px] text-on-surface-variant">Hà Đông, Hà Nội · Tương truyền canh cửi từ năm 865 (TK IX)</p>
                   </div>
                 </div>
                 <a
@@ -687,7 +735,13 @@ export default function Home() {
 
             <div className="md:col-span-2 flex flex-col gap-1.5 text-xs">
               <span className="uppercase tracking-wider font-bold text-on-surface mb-1 font-mono text-[11px]">Di Sản &amp; Làng Nghề</span>
-              <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">Điển Thư Canh Cửi</a>
+              <button
+                type="button"
+                onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
+                className="text-left text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+              >
+                Điển Thư &amp; Nguồn Khảo Cứu
+              </button>
               <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">Nghệ Nhân Dệt May</a>
               <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">Triết Lý Giấy Dó</a>
             </div>
@@ -706,6 +760,13 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* 6. HERITAGE SOURCES & CODEX MODAL */}
+      <HeritageSourcesModal
+        isOpen={codexOpen}
+        onClose={() => setCodexOpen(false)}
+        focusedSourceId={focusedSourceId}
+      />
     </div>
   );
 }

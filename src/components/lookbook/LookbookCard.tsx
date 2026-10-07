@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import ExportButton from "./ExportButton";
 
 export interface ComboResult {
@@ -18,6 +18,39 @@ export interface ComboResult {
 
 interface LookbookCardProps {
   result: ComboResult;
+}
+
+function ExpandableText({
+  text,
+  maxChars = 70,
+  className = "",
+  italic = false,
+}: {
+  text: string;
+  maxChars?: number;
+  className?: string;
+  italic?: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  if (!text) return null;
+  const isLong = text.length > maxChars;
+
+  return (
+    <div className={className}>
+      <span className={italic ? "italic" : ""}>
+        {expanded || !isLong ? text : `${text.slice(0, maxChars)}...`}
+      </span>
+      {isLong && (
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="ml-1.5 inline-flex items-center text-[9px] font-bold text-nep-indigo hover:text-nep-red transition-colors underline cursor-pointer"
+        >
+          {expanded ? "Thu gọn ▲" : "Xem thêm ▼"}
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function LookbookCard({ result }: LookbookCardProps) {
@@ -44,7 +77,7 @@ export default function LookbookCard({ result }: LookbookCardProps) {
     <div className="flex flex-col items-center">
       <div 
         ref={cardRef} 
-        className="relative bg-nep-paper w-[360px] min-h-[660px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-5"
+        className="relative bg-nep-paper w-[360px] min-h-[660px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-5 transition-all duration-300"
       >
         {/* Header */}
         <div className="text-center mb-2">
@@ -69,7 +102,7 @@ export default function LookbookCard({ result }: LookbookCardProps) {
             return (
               <div 
                 key={idx}
-                className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-xl p-1.5 shadow-md border border-nep-ink/10 flex flex-col items-center z-10 max-w-[76px]"
+                className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm rounded-xl p-1.5 shadow-md border border-nep-ink/10 flex flex-col items-center z-10 max-w-[76px]"
               >
                 <span className="text-[8px] uppercase tracking-wider font-semibold text-nep-indigo mb-0.5">Phụ kiện</span>
                 {accImg && (
@@ -125,7 +158,7 @@ export default function LookbookCard({ result }: LookbookCardProps) {
           )}
         </div>
 
-        {/* Score Bar */}
+        {/* Score Bar with Expandable Comment */}
         <div className="mb-2.5 bg-white/50 p-2.5 rounded-xl border border-nep-ink/5">
           <div className="flex justify-between items-center mb-1">
             <span className="text-[11px] font-medium text-nep-ink/80">Điểm hài hòa màu sắc</span>
@@ -138,26 +171,40 @@ export default function LookbookCard({ result }: LookbookCardProps) {
             />
           </div>
           {result.nhan_xet_mau && (
-            <p className="text-[9px] text-nep-ink/70 mt-1 line-clamp-1 italic">{result.nhan_xet_mau}</p>
+            <ExpandableText
+              text={result.nhan_xet_mau}
+              maxChars={60}
+              italic={true}
+              className="text-[9px] text-nep-ink/70 mt-1.5 leading-relaxed"
+            />
           )}
         </div>
 
-        {/* Cultural Explanation */}
+        {/* Cultural Explanation with Expandable Text */}
         <div className="bg-white/60 p-2.5 rounded-xl border border-nep-ink/5 mb-2">
-          <p className="text-[11px] leading-relaxed text-nep-ink/90 italic">
-            "{result.dien_giai_van_hoa || result.ly_do_phoi_do}"
-          </p>
+          <ExpandableText
+            text={`"${result.dien_giai_van_hoa || result.ly_do_phoi_do}"`}
+            maxChars={90}
+            italic={true}
+            className="text-[11px] leading-relaxed text-nep-ink/90"
+          />
         </div>
 
-        {/* Warning Details for VANG */}
+        {/* Warning Details for VANG with Expandable Text */}
         {result.muc_canh_bao === "VANG" && result.triggered_rules?.length > 0 && (
           <div className="bg-amber-50 p-2.5 rounded-xl border border-amber-200 mb-2">
-            <p className="text-[10px] text-amber-900 leading-tight">
-              <span className="font-bold">⚠️ Lưu ý văn hóa:</span>{" "}
-              {typeof result.triggered_rules[0] === "string"
-                ? result.triggered_rules[0]
-                : result.triggered_rules[0]?.message_vi || result.triggered_rules[0]?.id}
+            <p className="text-[10px] text-amber-900 leading-tight mb-0.5">
+              <span className="font-bold">⚠️ Lưu ý văn hóa:</span>
             </p>
+            <ExpandableText
+              text={
+                typeof result.triggered_rules[0] === "string"
+                  ? result.triggered_rules[0]
+                  : result.triggered_rules[0]?.message_vi || result.triggered_rules[0]?.id
+              }
+              maxChars={75}
+              className="text-[10px] text-amber-900/90 leading-snug"
+            />
           </div>
         )}
 

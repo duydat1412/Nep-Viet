@@ -1,0 +1,34 @@
+[
+  {
+    "id": "kb_ngu_than",
+    "type": "item_group",
+    "title": "Áo ngũ thân tay chẽn",
+    "points": [
+      {
+        "text": "<<PLACEHOLDER: description>>",
+        "source_ids": ["N1"]
+      },
+      {
+        "text": "<<PLACEHOLDER: description>>",
+        "source_ids": ["N1"]
+      }
+    ],
+    "scope": "Thường phục truyền thống triều Nguyễn",
+    "not_covered": "Không đại diện cho lễ phục đại triều cung đình",
+    "confidence": "chua_xac_minh"
+  },
+  {
+    "id": "kb_nhat_binh",
+    "type": "item_group",
+    "title": "Áo Nhật bình",
+    "points": [
+      {
+        "text": "<<PLACEHOLDER>>",
+        "source_ids": ["S_VNNEWS_NHATBINH"]
+      }
+    ],
+    "scope": "Lễ phục cung đình nữ triều Nguyễn",
+    "not_covered": "MVP chưa hỗ trợ phối outfit với Nhật bình",
+    "confidence": "chua_xac_minh"
+  }
+]

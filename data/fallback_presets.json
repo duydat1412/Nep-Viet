@@ -1,0 +1,44 @@
+[
+  {
+    "input": {
+      "occasion": "di_le",
+      "group": "ao_ngu_than",
+      "gender": "nam",
+      "style_level": "truyen_thong",
+      "tone": "tram"
+    },
+    "result": {
+      "combo_id": "combo_di_le_01",
+      "outfit_item_ids": ["ao_ngu_than_nam_xanh_01", "quan_trang_01", "guoc_moc_01"],
+      "muc_canh_bao": "XANH",
+      "diem_hai_hoa_mau": 9.2,
+      "ly_do_phoi_do": "<<PLACEHOLDER: Lý do phối đồ truyền thống đi lễ>>",
+      "nhan_xet_mau": "<<PLACEHOLDER: Nhận xét hài hòa màu sắc>>",
+      "dien_giai_van_hoa": "<<PLACEHOLDER: Diễn giải ý nghĩa văn hóa>>",
+      "source_ids": ["N1"],
+      "triggered_rules": [],
+      "kb_ids": ["kb_ngu_than"]
+    }
+  },
+  {
+    "input": {
+      "occasion": "di_le",
+      "group": "ao_ngu_than",
+      "gender": "nam",
+      "style_level": "phoi_hien_dai",
+      "tone": "tram"
+    },
+    "result": {
+      "combo_id": "combo_di_le_02",
+      "outfit_item_ids": ["ao_ngu_than_nam_xanh_01", "quan_trang_01", "sneaker_trang_01", "tote_kem_01"],
+      "muc_canh_bao": "VANG",
+      "diem_hai_hoa_mau": 8.8,
+      "ly_do_phoi_do": "<<PLACEHOLDER: Lý do phối hiện đại đi lễ>>",
+      "nhan_xet_mau": "<<PLACEHOLDER: Nhận xét màu sắc>>",
+      "dien_giai_van_hoa": "<<PLACEHOLDER: Diễn giải>>",
+      "source_ids": ["N1"],
+      "triggered_rules": ["R_DILE_03"],
+      "kb_ids": ["kb_ngu_than"]
+    }
+  }
+]

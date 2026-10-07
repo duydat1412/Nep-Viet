@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import ExportButton from "./ExportButton";
-import { Store, Tag, Sparkles, ExternalLink, Phone } from "lucide-react";
+import { Store, Tag, Sparkles, ExternalLink, Phone, Bookmark } from "lucide-react";
 import { getSourceShortName, getSlotName, getGroupName } from "@/lib/constants/sources";
+import { saveLook, isLookSaved } from "@/lib/storage/favorites";
 
 export interface ComboResult {
   combo_id: string;
@@ -59,6 +60,16 @@ function ExpandableText({
 export default function LookbookCard({ result, onOpenSource }: LookbookCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    setIsSaved(isLookSaved(result.combo_id));
+  }, [result.combo_id]);
+
+  const handleToggleSave = () => {
+    const saved = saveLook(result);
+    setIsSaved(saved);
+  };
 
   const badgeConfig = {
     XANH: { bg: "bg-emerald-100", text: "text-emerald-800", icon: "✓", label: "Phù hợp văn hóa" },
@@ -445,8 +456,24 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
         </div>
       )}
 
-      <div className="mt-4 w-full max-w-[360px] flex justify-center">
-        <ExportButton cardRef={cardRef} comboId={result.combo_id} />
+      <div className="mt-4 w-full max-w-[360px] flex items-center justify-between gap-2.5">
+        <button
+          type="button"
+          onClick={handleToggleSave}
+          className={`flex-1 py-3 px-3 rounded-full text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm cursor-pointer border ${
+            isSaved
+              ? "bg-amber-100 border-amber-300 text-amber-900"
+              : "bg-white hover:bg-nep-paper border-nep-ink/15 text-nep-ink"
+          }`}
+          title={isSaved ? "Gỡ khỏi tủ đồ đã lưu" : "Lưu vào tủ đồ yêu thích"}
+        >
+          <Bookmark className={`w-3.5 h-3.5 ${isSaved ? "fill-amber-600 text-amber-600" : "text-nep-ink/60"}`} />
+          <span>{isSaved ? "Đã Lưu Tủ Đồ" : "Lưu Tủ Đồ"}</span>
+        </button>
+
+        <div className="flex-1">
+          <ExportButton cardRef={cardRef} comboId={result.combo_id} />
+        </div>
       </div>
     </div>
   );

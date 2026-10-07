@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { 
   Sparkles, 
   Check, 
@@ -22,6 +22,8 @@ import {
 import LookbookCard from "@/components/lookbook/LookbookCard";
 import { LoadingSkeleton, ErrorCard, ChuaDuCanCuCard, FallbackBanner } from "@/components/lookbook/CardStates";
 import HeritageSourcesModal from "@/components/codex/HeritageSourcesModal";
+import SavedLooksModal from "@/components/lookbook/SavedLooksModal";
+import { getSavedLooks } from "@/lib/storage/favorites";
 
 export default function Home() {
   // Styling Studio States
@@ -41,6 +43,19 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Saved Looks (Tủ đồ yêu thích trên máy) State
+  const [savedLooksOpen, setSavedLooksOpen] = useState(false);
+  const [savedCount, setSavedCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      setSavedCount(getSavedLooks().length);
+    };
+    updateCount();
+    window.addEventListener("nep_viet_favorites_updated", updateCount);
+    return () => window.removeEventListener("nep_viet_favorites_updated", updateCount);
+  }, []);
 
   // Form submit trigger
   const handleGenerate = async (
@@ -238,6 +253,16 @@ export default function Home() {
             >
               {audioPlaying ? <Volume2 className="w-3.5 h-3.5 text-secondary animate-pulse" /> : <VolumeX className="w-3.5 h-3.5" />}
               <span>{audioPlaying ? "Đang phát: Lưu Thủy" : "Nhã Nhạc Ambience"}</span>
+            </button>
+
+            <button
+              onClick={() => setSavedLooksOpen(true)}
+              type="button"
+              className="px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100 font-mono text-[11px] font-bold text-amber-900 border border-amber-300/60 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
+              title="Xem tủ đồ các bản phối đã lưu"
+            >
+              <Bookmark className={`w-3 h-3 ${savedCount > 0 ? "fill-amber-700 text-amber-700" : "text-amber-800"}`} />
+              <span>Tủ Đồ ({savedCount})</span>
             </button>
 
             <button
@@ -858,6 +883,21 @@ export default function Home() {
         isOpen={codexOpen}
         onClose={() => setCodexOpen(false)}
         focusedSourceId={focusedSourceId}
+      />
+
+      {/* 7. SAVED LOOKS (TỦ ĐỒ YÊU THÍCH) MODAL */}
+      <SavedLooksModal
+        isOpen={savedLooksOpen}
+        onClose={() => setSavedLooksOpen(false)}
+        onSelectLook={(savedResult) => {
+          setResult({
+            trang_thai: "DU_CAN_CU",
+            phuong_an: [savedResult],
+            fallback_used: false,
+          });
+          const el = document.getElementById("lookbook");
+          el?.scrollIntoView({ behavior: "smooth" });
+        }}
       />
     </div>
   );

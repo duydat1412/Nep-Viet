@@ -12,7 +12,20 @@
     "tags": ["kin_dao", "mau_tram"],
     "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
     "source_ids": ["N1"],
-    "status": "draft"
+    "status": "draft",
+    "brand": {
+      "name": "Ỷ Vân Hiên",
+      "location": "Hà Nội",
+      "url": "https://yvanhien.com",
+      "contact": "0988 123 456"
+    },
+    "pricing": {
+      "buy_price": 3450000,
+      "rental_price": 350000,
+      "currency": "VND"
+    },
+    "material": "Lụa tơ tằm dệt hoa mây thủ công",
+    "craftsmanship_lore": "May thủ công phom áo năm thân tay chẽn thời Nguyễn, cài 5 khuy đồng đúc tượng trưng cho Ngũ thường."
   },
   {
     "id": "quan_trang_01",
@@ -27,13 +40,26 @@
     "tags": ["kin_dao"],
     "asset": "/assets/items/quan_trang_01.png",
     "source_ids": ["N1"],
-    "status": "draft"
+    "status": "draft",
+    "brand": {
+      "name": "Hợp Tác Xã Lụa Vạn Phúc",
+      "location": "Hà Đông, Hà Nội",
+      "url": "https://luavanphuc.vn",
+      "contact": "0912 345 678"
+    },
+    "pricing": {
+      "buy_price": 1200000,
+      "rental_price": 150000,
+      "currency": "VND"
+    },
+    "material": "Lụa tơ tằm ngà mộc tự nhiên",
+    "craftsmanship_lore": "Ống suông rộng tạo độ rủ sóng sánh khi di chuyển, dệt từ sợi tơ tằm nguyên bản không nhuộm hóa chất."
   },
   {
     "id": "guoc_moc_01",
     "slot": "footwear",
     "group": "phu_kien",
-    "name_vi": "Guốc mộc quai vải",
+    "name_vi": "Guốc mộc quai gấm",
     "gender": "unisex",
     "colors": [{"name": "go_nau", "hex": "#5D4037"}],
     "formality": 3,
@@ -42,7 +68,19 @@
     "tags": ["co_dien", "kin_dao"],
     "asset": "/assets/items/guoc_moc_01.png",
     "source_ids": ["N1"],
-    "status": "draft"
+    "status": "draft",
+    "brand": {
+      "name": "Xưởng Guốc Mộc Bạch Đằng",
+      "location": "Bình Dương",
+      "contact": "0903 888 999"
+    },
+    "pricing": {
+      "buy_price": 450000,
+      "rental_price": 60000,
+      "currency": "VND"
+    },
+    "material": "Gỗ xoan đào tự nhiên, quai gấm dệt chỉ vàng",
+    "craftsmanship_lore": "Đế guốc đẽo thủ công gọt lượn theo vòm bàn chân, đóng đinh tán đồng chắc chắn."
   },
   {
     "id": "sneaker_trang_01",
@@ -57,13 +95,25 @@
     "tags": ["hien_dai", "phu_kien_duong_pho"],
     "asset": "/assets/items/sneaker_trang_01.png",
     "source_ids": [],
-    "status": "draft"
+    "status": "draft",
+    "brand": {
+      "name": "Ananas Vietnam",
+      "location": "Việt Nam",
+      "url": "https://ananas.vn"
+    },
+    "pricing": {
+      "buy_price": 650000,
+      "rental_price": 0,
+      "currency": "VND"
+    },
+    "material": "Vải Canvas & đế cao su lưu hóa",
+    "craftsmanship_lore": "Đôi giày thể thao năng động giúp người trẻ thoải mái sải bước khi kết hợp cùng cổ phục dạo phố."
   },
   {
     "id": "tote_kem_01",
     "slot": "bag",
     "group": "phu_kien",
-    "name_vi": "Túi canvas trơn",
+    "name_vi": "Túi canvas ngà mộc",
     "gender": "unisex",
     "colors": [{"name": "kem", "hex": "#EFE8DC"}],
     "formality": 1,
@@ -72,6 +122,18 @@
     "tags": ["hien_dai", "phu_kien_duong_pho"],
     "asset": "/assets/items/tote_kem_01.png",
     "source_ids": [],
-    "status": "draft"
+    "status": "draft",
+    "brand": {
+      "name": "Tiệm Cổ Phong",
+      "location": "Hà Nội",
+      "contact": "0977 222 333"
+    },
+    "pricing": {
+      "buy_price": 180000,
+      "rental_price": 0,
+      "currency": "VND"
+    },
+    "material": "Vải bố dệt sợi thô tự nhiên",
+    "craftsmanship_lore": "Túi tote trơn phom rộng tiện dụng, đựng vừa máy ảnh và vật dụng cá nhân cho những buổi chụp kỷ yếu."
   }
 ]

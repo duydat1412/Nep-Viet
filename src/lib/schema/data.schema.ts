@@ -14,6 +14,19 @@ export const ColorSchema = z.object({
   hex: z.string()
 });
 
+export const BrandSchema = z.object({
+  name: z.string(),
+  location: z.string().optional(),
+  url: z.string().optional(),
+  contact: z.string().optional()
+});
+
+export const PricingSchema = z.object({
+  buy_price: z.number().optional(),
+  rental_price: z.number().optional(),
+  currency: z.string().default('VND')
+});
+
 export const ItemSchema = z.object({
   id: z.string(),
   slot: SlotsEnum,
@@ -27,7 +40,11 @@ export const ItemSchema = z.object({
   tags: z.array(z.string()),
   asset: z.string(),
   source_ids: z.array(z.string()),
-  status: z.enum(['draft', 'reviewed'])
+  status: z.enum(['draft', 'reviewed']),
+  brand: BrandSchema.optional(),
+  pricing: PricingSchema.optional(),
+  material: z.string().optional(),
+  craftsmanship_lore: z.string().optional()
 });
 
 export const RuleSchema = z.object({

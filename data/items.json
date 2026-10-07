@@ -135,5 +135,163 @@
     },
     "material": "Vải bố dệt sợi thô tự nhiên",
     "craftsmanship_lore": "Túi tote trơn phom rộng tiện dụng, đựng vừa máy ảnh và vật dụng cá nhân cho những buổi chụp kỷ yếu."
+  },
+  {
+    "id": "ao_ngu_than_nu_hoang_cuc",
+    "slot": "top",
+    "group": "ao_ngu_than",
+    "name_vi": "Áo ngũ thân nữ tay chẽn hoàng cúc",
+    "gender": "nu",
+    "colors": [{"name": "vang_hoang_cuc", "hex": "#FDC668"}],
+    "formality": 4,
+    "occasions": ["di_le", "ky_yeu", "dao_pho", "tet"],
+    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
+    "tags": ["kin_dao", "mau_tuoi"],
+    "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
+    "source_ids": ["N1"],
+    "status": "draft",
+    "brand": {
+      "name": "Ỷ Vân Hiên",
+      "location": "Hà Nội",
+      "url": "https://yvanhien.com",
+      "contact": "0988 123 456"
+    },
+    "pricing": {
+      "buy_price": 3200000,
+      "rental_price": 350000,
+      "currency": "VND"
+    },
+    "material": "Lụa sa Lã Khê dệt hoa cúc cài",
+    "craftsmanship_lore": "Phom áo ngũ thân nữ may đo tôn eo thon thả, năm thân cài khuy đồng bọc ngọc trang nhã."
+  },
+  {
+    "id": "ao_tac_nam_01",
+    "slot": "top",
+    "group": "ao_tac",
+    "name_vi": "Áo tấc nam tay thụng lam sẫm",
+    "gender": "nam",
+    "colors": [{"name": "xanh_cham", "hex": "#26466D"}],
+    "formality": 4,
+    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
+    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
+    "tags": ["kin_dao", "tay_thung"],
+    "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
+    "source_ids": ["N1", "S_VJOL_CUNGDINH"],
+    "status": "draft",
+    "brand": {
+      "name": "Ỷ Vân Hiên",
+      "location": "Hà Nội"
+    },
+    "pricing": {
+      "buy_price": 3800000,
+      "rental_price": 400000,
+      "currency": "VND"
+    },
+    "material": "Lụa gấm Vạn Phúc hoa văn chữ Thọ",
+    "craftsmanship_lore": "Lễ phục tay thụng rộng xẻ tà phóng khoáng của triều Nguyễn."
+  },
+  {
+    "id": "ao_tac_nu_01",
+    "slot": "top",
+    "group": "ao_tac",
+    "name_vi": "Áo tấc nữ tay thụng hồng đào",
+    "gender": "nu",
+    "colors": [{"name": "hong_sen", "hex": "#E8909C"}],
+    "formality": 4,
+    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
+    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
+    "tags": ["kin_dao", "tay_thung"],
+    "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
+    "source_ids": ["N1", "S_VJOL_CUNGDINH"],
+    "status": "draft",
+    "brand": {
+      "name": "Cổ Phục Hoa Niên",
+      "location": "Huế"
+    },
+    "pricing": {
+      "buy_price": 3600000,
+      "rental_price": 380000,
+      "currency": "VND"
+    },
+    "material": "Gấm dệt tơ tằm thêu viền hoa sen",
+    "craftsmanship_lore": "Tay thụng dài buông mềm mại, mang nét quý phái của cung đình Huế."
+  },
+  {
+    "id": "ao_dai_nam_01",
+    "slot": "top",
+    "group": "ao_dai",
+    "name_vi": "Áo dài nam truyền thống xanh lục",
+    "gender": "nam",
+    "colors": [{"name": "xanh_luc", "hex": "#2E5339"}],
+    "formality": 3,
+    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
+    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
+    "tags": ["kin_dao"],
+    "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
+    "source_ids": ["N1"],
+    "status": "draft",
+    "brand": {
+      "name": "Áo Dài Thăng Long",
+      "location": "Hà Nội"
+    },
+    "pricing": {
+      "buy_price": 2500000,
+      "rental_price": 280000,
+      "currency": "VND"
+    },
+    "material": "Lụa gấm Hà Đông dệt họa tiết mây",
+    "craftsmanship_lore": "Cổ đứng hai phân thanh nhã, tôn vẻ trang trọng của nam nhi."
+  },
+  {
+    "id": "ao_dai_nu_01",
+    "slot": "top",
+    "group": "ao_dai",
+    "name_vi": "Áo dài nữ truyền thống trắng ngà",
+    "gender": "nu",
+    "colors": [{"name": "trang_nga", "hex": "#F8F9FA"}],
+    "formality": 3,
+    "occasions": ["di_le", "tet", "dao_pho", "ky_yeu"],
+    "style_levels": ["truyen_thong", "cach_tan_nhe", "phoi_hien_dai"],
+    "tags": ["kin_dao"],
+    "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
+    "source_ids": ["N1"],
+    "status": "draft",
+    "brand": {
+      "name": "Áo Dài Liên Hương",
+      "location": "TP.HCM"
+    },
+    "pricing": {
+      "buy_price": 2600000,
+      "rental_price": 300000,
+      "currency": "VND"
+    },
+    "material": "Lụa tơ tằm Vạn Phúc dệt hoa chìm",
+    "craftsmanship_lore": "Tà áo dài thướt tha mềm rủ, phom dáng cổ điển tôn nét duyên Việt."
+  },
+  {
+    "id": "ao_tu_than_nu_01",
+    "slot": "top",
+    "group": "ao_tu_than",
+    "name_vi": "Áo tứ thân nữ Kinh Bắc",
+    "gender": "nu",
+    "colors": [{"name": "nau_song", "hex": "#5D4037"}],
+    "formality": 3,
+    "occasions": ["di_le", "dao_pho", "bieu_dien"],
+    "style_levels": ["truyen_thong", "cach_tan_nhe"],
+    "tags": ["kin_dao"],
+    "asset": "/assets/items/ao_ngu_than_nam_xanh_01.png",
+    "source_ids": ["S_BTHN_TUTHAN", "S_VINWONDERS_QUANHO"],
+    "status": "draft",
+    "brand": {
+      "name": "Tiệm Cổ Phong Kinh Bắc",
+      "location": "Bắc Ninh"
+    },
+    "pricing": {
+      "buy_price": 2800000,
+      "rental_price": 320000,
+      "currency": "VND"
+    },
+    "material": "Vải đũi thô nhuộm củ nâu truyền thống",
+    "craftsmanship_lore": "Bốn vạt áo mộc mạc biểu trưng cho bốn đức tính tốt đẹp của phụ nữ Việt."
   }
 ]

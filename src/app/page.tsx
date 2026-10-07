@@ -25,14 +25,13 @@ import HeritageSourcesModal from "@/components/codex/HeritageSourcesModal";
 
 export default function Home() {
   // Styling Studio States
-  const [silhouette, setSilhouette] = useState("ao_ngu_than"); // ao_ngu_than, ao_tac, ao_dai
-  const [fabric, setFabric] = useState("van_phuc"); // van_phuc, lanh_my_a, dui_nam_cao
+  const [occasion, setOccasion] = useState("di_le"); // di_le, tet, ky_yeu, dao_pho, bieu_dien
+  const [silhouette, setSilhouette] = useState("ao_ngu_than"); // ao_ngu_than, ao_tac, ao_dai, ao_tu_than
+  const [gender, setGender] = useState<"nam" | "nu">("nam"); // nam, nu
+  const [styleLevel, setStyleLevel] = useState("truyen_thong"); // truyen_thong, cach_tan_nhe, phoi_hien_dai
   const [colorway, setColorway] = useState("tram"); // tram, tuoi, pastel, ngu_hanh
-  const [occasion, setOccasion] = useState("di_le");
-  const [heritageSlider, setHeritageSlider] = useState(65);
-  const [fluiditySlider, setFluiditySlider] = useState(88);
   const [audioPlaying, setAudioPlaying] = useState(false);
-  const [activeMode, setActiveMode] = useState("minimalist");
+  const [activeMode, setActiveMode] = useState("ceremonial");
 
   // Codex & Source References State
   const [codexOpen, setCodexOpen] = useState(false);
@@ -44,7 +43,12 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   // Form submit trigger
-  const handleGenerate = async (customOccasion?: string, customGroup?: string) => {
+  const handleGenerate = async (
+    customOccasion?: string, 
+    customGroup?: string, 
+    customStyle?: string, 
+    customGender?: string
+  ) => {
     setLoading(true);
     setError(null);
     try {
@@ -54,8 +58,8 @@ export default function Home() {
         body: JSON.stringify({
           occasion: customOccasion || occasion,
           group: customGroup || silhouette,
-          gender: "nam",
-          style_level: heritageSlider > 50 ? "truyen_thong" : "phoi_hien_dai",
+          gender: customGender || gender,
+          style_level: customStyle || styleLevel,
           tone: colorway,
         }),
       });
@@ -70,57 +74,111 @@ export default function Home() {
     }
   };
 
+  const occasions = [
+    {
+      id: "di_le",
+      name: "Đi Lễ / Viếng Chùa",
+      en: "Sacred Temple Visit",
+      desc: "Chốn tôn nghiêm, kiểm soát trang phục đoan trang, nghiêm cẩn và kín đáo.",
+      badge: "Nghi Lễ Tôn Nghiêm",
+      icon: "🛕",
+    },
+    {
+      id: "tet",
+      name: "Khai Xuân Tết Cổ Truyền",
+      en: "Lunar New Year Gathering",
+      desc: "Du xuân chúc phúc đầu năm, chuộng sắc màu tươi sáng, kiêng kỵ toàn đen trắng.",
+      badge: "Hỷ Khí Cát Tường",
+      icon: "🧧",
+    },
+    {
+      id: "ky_yeu",
+      name: "Chụp Kỷ Yếu / Học Đường",
+      en: "Graduation Youth Album",
+      desc: "Lưu giữ thanh xuân học trò, tự do thể hiện phong cách trẻ trung năng động.",
+      badge: "Thanh Xuân Tự Do",
+      icon: "📸",
+    },
+    {
+      id: "dao_pho",
+      name: "Dạo Phố / Check-in Di Tích",
+      en: "Urban Stroll & Check-in",
+      desc: "Chuyển động nhẹ nhàng thoải mái, giao thoa hơi thở đô thị và nét di sản.",
+      badge: "Thường Phục Đô Thị",
+      icon: "🏙️",
+    },
+    {
+      id: "bieu_dien",
+      name: "Biểu Diễn Nghệ Thuật",
+      en: "Stage & Cultural Performance",
+      desc: "Sân khấu diễn xướng di sản, tôn vinh nghệ thuật truyền thống Bắc - Trung - Nam.",
+      badge: "Diễn Xướng Di Sản",
+      icon: "🎭",
+    },
+  ];
+
   const silhouettes = [
+    {
+      id: "ao_ngu_than",
+      name: "Áo Ngũ Thân Tay Chẽn",
+      en: "Fitted Mandarin Cut",
+      desc: "Năm thân biểu trưng tứ thân phụ mẫu và chính mình, ôm gọn cổ đứng trang nhã.",
+      era: "Chúa Vũ Vương (1744) & Vua Minh Mạng (1827)",
+      group: "ao_ngu_than",
+    },
     {
       id: "ao_tac",
       name: "Áo Tấc Đương Đại",
       en: "Wide-Sleeve Imperial Robe",
-      desc: "Tay thụng rộng xẻ tà phóng khoáng, khuy cài ngọc bích lệch góc ngũ thân.",
+      desc: "Tay thụng rộng xẻ tà phóng khoáng, lễ phục chuẩn mực triều Nguyễn trong khánh tiết.",
       era: "Triều Nguyễn (1802 – 1945)",
-      icon: "checkroom",
-      group: "ao_tac"
-    },
-    {
-      id: "ao_ngu_than",
-      name: "Ngũ Thân Tay Chẽn",
-      en: "Fitted Mandarin Cut",
-      desc: "Năm thân biểu trưng tứ thân phụ mẫu ôm gọn cổ đứng, tay chẽn hiện đại.",
-      era: "Chúa Vũ Vương (1744) & Vua Minh Mạng (1827)",
-      icon: "dry_cleaning",
-      group: "ao_ngu_than"
+      group: "ao_tac",
     },
     {
       id: "ao_dai",
       name: "Áo Dài Truyền Thống",
       en: "Heritage Long Tunic",
-      desc: "Cổ đứng hai phân thanh nhã, hai tà bay bổng tôn dáng vẻ đoan trang.",
+      desc: "Cổ đứng hai phân thanh nhã, hai tà bay bổng tôn vinh dáng vẻ đoan trang.",
       era: "Thời Lê Sơ (1428) – TK XIX-XX",
-      icon: "styler",
-      group: "ao_dai"
+      group: "ao_dai",
+    },
+    {
+      id: "ao_tu_than",
+      name: "Áo Tứ Thân Bắc Bộ",
+      en: "Four-Panel Kinh Bac Robe",
+      desc: "Bốn vạt mộc mạc duyên dáng, đậm đà hồn quê dân ca quan họ Bắc Ninh.",
+      era: "Dân Gian Bắc Bộ",
+      group: "ao_tu_than",
     },
   ];
 
-  const fabrics = [
+  const styleLevels = [
     {
-      id: "van_phuc",
-      name: "Tơ Tằm Vạn Phúc (Hà Đông Raw Silk)",
-      badge: "22 Momme",
-      desc: "Dệt thủ công từ kén tơ vàng tự nhiên, bề mặt có độ gợn đũi mộc mạc, lưu thông khí huyết tối ưu.",
-      dropIndex: "Chỉ số rủ 94%",
+      id: "truyen_thong",
+      name: "Truyền Thống Nguyên Bản",
+      en: "Heritage Canonical",
+      desc: "Giữ trọn nếp xưa đoan chính, tuân thủ nguyên bản quy thức cổ phục, phối cùng guốc mộc và quần lụa suông.",
+      badge: "Phù Hợp Điển Chế (Xanh)",
+      badgeColor: "bg-emerald-100 text-emerald-800",
+      icon: "🏛️",
     },
     {
-      id: "lanh_my_a",
-      name: "Lãnh Mỹ A (Tân Châu Ebony Silk)",
-      badge: "Mặc Nưa Dye",
-      desc: "Nhuộm mủ trái mặc nưa 100 lần, đập lụa thủ công cho ánh đen tuyền bóng ngọc kiêu sa.",
-      dropIndex: "Chỉ số rủ 98%",
+      id: "cach_tan_nhe",
+      name: "Cách Tân Nhẹ Nhàng",
+      en: "Refined Contemporary",
+      desc: "Tiết chế các lớp áo gò bó, phom dáng buông suông thoải mái, phù hợp cho nhịp sống thường nhật.",
+      badge: "Thoải Mái & Tối Giản",
+      badgeColor: "bg-sky-100 text-sky-800",
+      icon: "✨",
     },
     {
-      id: "dui_nam_cao",
-      name: "Đũi Nam Cao (Thái Bình Raw Hemp)",
-      badge: "Tự Nhiên 100%",
-      desc: "Sợi kéo tay thô ráp giàu cá tính nghệ thuật, tôn vinh vết thời gian và sự bền bỉ của đất mẹ.",
-      dropIndex: "Chỉ số rủ 85%",
+      id: "phoi_hien_dai",
+      name: "Phối Hiện Đại (Gen Z)",
+      en: "Neo-Heritage Streetwear",
+      desc: "Giao thoa táo bạo cùng sneaker trắng, túi canvas đường phố; tạo ấn tượng trẻ trung cá tính.",
+      badge: "Cần Lưu Ý Khi Đi Lễ (Vàng)",
+      badgeColor: "bg-amber-100 text-amber-800",
+      icon: "🔥",
     },
   ];
 
@@ -288,64 +346,66 @@ export default function Home() {
               
               {/* Step Navigation Progress Tabs */}
               <div className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-nep-ink/5">
-                <div className="grid grid-cols-4 gap-2 text-left">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
                   <div className="flex flex-col text-left">
-                    <span className="text-[10px] font-bold text-primary tracking-wider uppercase font-mono">01. PHOM DÁNG</span>
+                    <span className="text-[10px] font-bold text-primary tracking-wider uppercase font-mono">01. NGỮ CẢNH DỊP</span>
                     <span className="text-xs text-on-surface font-semibold truncate">
-                      {silhouettes.find(s => s.id === silhouette)?.name}
+                      {occasions.find(o => o.id === occasion)?.name}
                     </span>
                     <div className="h-1 w-full bg-primary-container rounded-full mt-1.5" />
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-[10px] font-bold text-secondary tracking-wider uppercase font-mono">02. CANH CỬI</span>
+                    <span className="text-[10px] font-bold text-secondary tracking-wider uppercase font-mono">02. PHOM &amp; GIỚI TÍNH</span>
                     <span className="text-xs text-on-surface font-semibold truncate">
-                      {fabrics.find(f => f.id === fabric)?.name.split("(")[0]}
+                      {gender === "nam" ? "Nam" : "Nữ"} · {silhouettes.find(s => s.id === silhouette)?.name.split(" ")[0]}
                     </span>
                     <div className="h-1 w-full bg-secondary-container rounded-full mt-1.5" />
                   </div>
                   <div className="flex flex-col text-left">
-                    <span className="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase font-mono">03. BẢNG MÀU</span>
+                    <span className="text-[10px] font-bold text-nep-indigo tracking-wider uppercase font-mono">03. PHONG CÁCH</span>
+                    <span className="text-xs text-on-surface font-semibold truncate">
+                      {styleLevels.find(s => s.id === styleLevel)?.name}
+                    </span>
+                    <div className="h-1 w-full bg-nep-indigo/60 rounded-full mt-1.5" />
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase font-mono">04. NGŨ SẮC</span>
                     <span className="text-xs text-on-surface font-semibold truncate">
                       {colors.find(c => c.id === colorway)?.name}
                     </span>
                     <div className="h-1 w-full bg-primary-container/40 rounded-full mt-1.5" />
                   </div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-[10px] font-bold text-on-surface-variant tracking-wider uppercase font-mono">04. NGỮ CẢNH</span>
-                    <span className="text-xs text-on-surface font-semibold truncate">
-                      {occasion === "di_le" ? "Đi Lễ Chùa" : occasion === "tet" ? "Khai Xuân Tết" : "Dạo Phố"}
-                    </span>
-                    <div className="h-1 w-full bg-surface-container-high rounded-full mt-1.5" />
-                  </div>
                 </div>
               </div>
 
-              {/* Step 1: Phom Dáng Kiến Trúc */}
+              {/* BƯỚC 01: DỊP XUẤT HIỆN & NGỮ CẢNH */}
               <article className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-nep-ink/5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <h2 className="font-heading text-lg font-bold text-on-surface">Bước 01: Kiến Trúc Phom Dáng</h2>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed font-bold">
-                        ĐÃ CHỌN
+                      <h2 className="font-heading text-lg font-bold text-on-surface">Bước 01: Ngữ Cảnh &amp; Dịp Xuất Hiện</h2>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-primary-fixed text-on-primary-fixed font-bold font-mono">
+                        YẾU TỐ QUYẾT ĐỊNH QUY TẮC
                       </span>
                     </div>
                     <p className="text-xs text-on-surface-variant mt-0.5">
-                      Tỉ lệ thân thụng, tay thụng đặc trưng vương triều giao thoa kết cấu thả suông tối giản.
+                      Quy chuẩn văn hóa được hệ thống Rule Engine áp dụng dựa trên không gian và mục đích diện y phục.
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {silhouettes.map((s) => {
-                    const isSelected = silhouette === s.id;
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {occasions.map((occ) => {
+                    const isSelected = occasion === occ.id;
                     return (
                       <div
-                        key={s.id}
-                        onClick={() => { setSilhouette(s.id); }}
-                        className={`p-4 rounded-xl transition-all cursor-pointer relative ${
+                        key={occ.id}
+                        onClick={() => {
+                          setOccasion(occ.id);
+                        }}
+                        className={`p-3.5 rounded-xl transition-all cursor-pointer relative flex flex-col justify-between ${
                           isSelected
-                            ? "bg-surface-container-low shadow-md ring-2 ring-primary-container scale-[1.02]"
+                            ? "bg-surface-container-low shadow-md ring-2 ring-primary-container scale-[1.01]"
                             : "bg-surface-container-lowest hover:bg-surface-container-low border border-nep-ink/10"
                         }`}
                       >
@@ -354,15 +414,21 @@ export default function Home() {
                             ✓
                           </div>
                         )}
-                        <h3 className="font-heading text-sm font-bold text-on-surface">
-                          {s.name}
-                        </h3>
-                        <p className="text-[10px] text-secondary mt-0.5 font-medium">{s.en}</p>
-                        <p className="text-[11px] text-on-surface-variant mt-2 leading-relaxed">
-                          {s.desc}
-                        </p>
-                        <div className="mt-3 pt-2 border-t border-nep-ink/5 flex items-center justify-between text-secondary">
-                          <span className="text-[9px] font-bold tracking-wider uppercase font-mono">{s.era}</span>
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-lg">{occ.icon}</span>
+                            <h3 className="font-heading text-sm font-bold text-on-surface">
+                              {occ.name}
+                            </h3>
+                          </div>
+                          <p className="text-[11px] text-on-surface-variant leading-relaxed">
+                            {occ.desc}
+                          </p>
+                        </div>
+                        <div className="mt-2.5 pt-2 border-t border-nep-ink/5 flex items-center justify-between">
+                          <span className="text-[9px] font-bold tracking-wider text-secondary uppercase font-mono">
+                            {occ.badge}
+                          </span>
                         </div>
                       </div>
                     );
@@ -370,54 +436,70 @@ export default function Home() {
                 </div>
               </article>
 
-              {/* Step 2: Canh Cửi & Chất Liệu */}
+              {/* BƯỚC 02: PHOM DÁNG CỔ PHỤC & GIỚI TÍNH */}
               <article className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-nep-ink/5">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                   <div>
-                    <h2 className="font-heading text-lg font-bold text-on-surface">Bước 02: Điển Thư Canh Cửi &amp; Chất Liệu</h2>
+                    <h2 className="font-heading text-lg font-bold text-on-surface">Bước 02: Kiến Trúc Phom Dáng &amp; Giới Tính</h2>
                     <p className="text-xs text-on-surface-variant mt-0.5">
-                      Chọn chất liệu dệt tự nhiên từ các làng nghề trứ danh nghìn năm tuổi.
+                      Khảo cứu phom dáng truyền thống theo điển chế triều đại kết hợp đối tượng mặc.
                     </p>
                   </div>
-                  <span className="text-[10px] text-secondary font-mono tracking-wider font-bold">MAT-CODEX · 2026</span>
+
+                  {/* Gender Selector Toggle */}
+                  <div className="inline-flex p-1 bg-surface-container-high rounded-full gap-1 border border-nep-ink/10 self-start sm:self-auto shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setGender("nam")}
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        gender === "nam" ? "bg-primary-container text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
+                      }`}
+                    >
+                      <span>👨 Quý Nam</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setGender("nu")}
+                      className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        gender === "nu" ? "bg-primary-container text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
+                      }`}
+                    >
+                      <span>👩 Quý Cô</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-2.5">
-                  {fabrics.map((f) => {
-                    const isSelected = fabric === f.id;
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {silhouettes.map((s) => {
+                    const isSelected = silhouette === s.id;
                     return (
                       <div
-                        key={f.id}
-                        onClick={() => setFabric(f.id)}
-                        className={`p-4 rounded-xl flex items-center justify-between gap-4 transition-all cursor-pointer ${
+                        key={s.id}
+                        onClick={() => { setSilhouette(s.id); }}
+                        className={`p-3.5 rounded-xl transition-all cursor-pointer relative flex flex-col justify-between ${
                           isSelected
-                            ? "bg-surface-container-low shadow-sm ring-2 ring-secondary/50"
+                            ? "bg-surface-container-low shadow-md ring-2 ring-primary-container scale-[1.01]"
                             : "bg-surface-container-lowest hover:bg-surface-container-low border border-nep-ink/10"
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-tertiary-container/20 flex items-center justify-center shrink-0 text-tertiary">
-                            <Palette className="w-5 h-5" />
+                        {isSelected && (
+                          <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center text-white text-[10px]">
+                            ✓
                           </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm text-on-surface">{f.name}</span>
-                              <span className="px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed text-[9px] font-bold">
-                                {f.badge}
-                              </span>
-                            </div>
-                            <p className="text-[11px] text-on-surface-variant mt-0.5 leading-snug">
-                              {f.desc}
-                            </p>
-                          </div>
+                        )}
+                        <div>
+                          <h3 className="font-heading text-sm font-bold text-on-surface">
+                            {s.name}
+                          </h3>
+                          <p className="text-[10px] text-secondary mt-0.5 font-medium">{s.en}</p>
+                          <p className="text-[11px] text-on-surface-variant mt-2 leading-relaxed">
+                            {s.desc}
+                          </p>
                         </div>
-                        <div className="flex items-center gap-2 shrink-0">
-                          <span className="text-[10px] font-bold text-primary hidden sm:inline">{f.dropIndex}</span>
-                          <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs ${
-                            isSelected ? "bg-primary text-white" : "border border-nep-ink/30"
-                          }`}>
-                            {isSelected && "✓"}
-                          </div>
+                        <div className="mt-2.5 pt-2 border-t border-nep-ink/5">
+                          <span className="text-[9px] font-bold tracking-wider text-secondary uppercase font-mono line-clamp-1">
+                            {s.era}
+                          </span>
                         </div>
                       </div>
                     );
@@ -425,11 +507,66 @@ export default function Home() {
                 </div>
               </article>
 
-              {/* Step 3: Ngũ Sắc & Tương Sinh */}
+              {/* BƯỚC 03: MỨC ĐỘ PHONG CÁCH & DIỄN GIẢI */}
               <article className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-nep-ink/5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h2 className="font-heading text-lg font-bold text-on-surface">Bước 03: Ngũ Sắc &amp; Tương Sinh Âm Dương</h2>
+                    <h2 className="font-heading text-lg font-bold text-on-surface">Bước 03: Mức Độ Phong Cách &amp; Diễn Giải</h2>
+                    <p className="text-xs text-on-surface-variant mt-0.5">
+                      Quyết định mức độ nguyên bản hay phá cách hiện đại, trực tiếp định đoạt các phụ kiện đi kèm.
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-secondary font-mono tracking-wider font-bold">STYLE CODEX</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {styleLevels.map((lvl) => {
+                    const isSelected = styleLevel === lvl.id;
+                    return (
+                      <div
+                        key={lvl.id}
+                        onClick={() => setStyleLevel(lvl.id)}
+                        className={`p-4 rounded-xl transition-all cursor-pointer relative flex flex-col justify-between ${
+                          isSelected
+                            ? "bg-surface-container-low shadow-md ring-2 ring-primary-container scale-[1.01]"
+                            : "bg-surface-container-lowest hover:bg-surface-container-low border border-nep-ink/10"
+                        }`}
+                      >
+                        {isSelected && (
+                          <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-primary flex items-center justify-center text-white text-[10px]">
+                            ✓
+                          </div>
+                        )}
+                        <div>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-xl">{lvl.icon}</span>
+                            <div>
+                              <h3 className="font-heading text-sm font-bold text-on-surface">
+                                {lvl.name}
+                              </h3>
+                              <span className="text-[10px] text-secondary font-medium">{lvl.en}</span>
+                            </div>
+                          </div>
+                          <p className="text-[11px] text-on-surface-variant leading-relaxed mt-1">
+                            {lvl.desc}
+                          </p>
+                        </div>
+                        <div className="mt-3 pt-2 border-t border-nep-ink/5 flex items-center justify-between">
+                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${lvl.badgeColor}`}>
+                            {lvl.badge}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </article>
+
+              {/* BƯỚC 04: BẢNG MÀU NGŨ SẮC TƯƠNG SINH */}
+              <article className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-nep-ink/5">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h2 className="font-heading text-lg font-bold text-on-surface">Bước 04: Bảng Màu &amp; Ngũ Sắc Tương Sinh Âm Dương</h2>
                     <p className="text-xs text-on-surface-variant mt-0.5">
                       Bảng màu ứng dụng thuật đối ngẫu sắc chàm truyền thống và ngà mộc giấy dó.
                     </p>
@@ -475,50 +612,6 @@ export default function Home() {
                 </div>
               </article>
 
-              {/* Step 4: AI Sliders Tuning */}
-              <article className="bg-surface-container-lowest p-6 rounded-2xl shadow-sm border border-nep-ink/5">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h2 className="font-heading text-lg font-bold text-on-surface">Bước 04: Tinh Chỉnh Thuật Toán Phong Cách</h2>
-                    <p className="text-xs text-on-surface-variant mt-0.5">
-                      Cân bằng tỷ lệ giữa tính chân xác khảo cứu triều đại và phong cách đường phố đương đại.
-                    </p>
-                  </div>
-                  <Sliders className="w-5 h-5 text-primary" />
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between items-center mb-1 text-xs">
-                      <span className="font-semibold text-on-surface">Bảo Tồn Di Sản vs. Tối Giản Đương Đại</span>
-                      <span className="font-mono font-bold text-primary">{heritageSlider}% Heritage / {100 - heritageSlider}% Modern</span>
-                    </div>
-                    <input 
-                      type="range" 
-                      min="10" 
-                      max="90" 
-                      value={heritageSlider}
-                      onChange={(e) => setHeritageSlider(Number(e.target.value))}
-                      className="w-full accent-primary-container cursor-pointer"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-1 text-xs">
-                      <span className="font-semibold text-on-surface">Độ Bay Bổng Của Nếp Vải (Silhouette Fluidity)</span>
-                      <span className="font-mono font-bold text-secondary">{fluiditySlider}% (Mềm mại)</span>
-                    </div>
-                    <input 
-                      type="range" 
-                      min="20" 
-                      max="100" 
-                      value={fluiditySlider}
-                      onChange={(e) => setFluiditySlider(Number(e.target.value))}
-                      className="w-full accent-secondary cursor-pointer"
-                    />
-                  </div>
-                </div>
-
                 {/* Big Action CTA */}
                 <div className="mt-6 pt-4 border-t border-nep-ink/10 flex flex-wrap items-center gap-3">
                   <button
@@ -557,7 +650,6 @@ export default function Home() {
                     <span>Tra Cứu Điển Thư</span>
                   </button>
                 </div>
-              </article>
             </section>
 
             {/* CỘT PHẢI: 9:16 Editorial Lookbook Card (~42% Sticky) */}

@@ -1,55 +1,5 @@
 [
   {
-    "id": "ao_ngu_than_moc_an_01",
-    "slot": "top",
-    "group": "ao_ngu_than",
-    "name_vi": "Áo dài nam ngũ thân truyền thống Mộc An vải linen cao cấp",
-    "gender": "nam",
-    "colors": [
-      {
-        "name": "Đỏ",
-        "hex": "#B5362B"
-      }
-    ],
-    "formality": 4,
-    "occasions": [
-      "tet",
-      "ky_yeu",
-      "di_le",
-      "bieu_dien"
-    ],
-    "style_levels": [
-      "truyen_thong"
-    ],
-    "tags": [
-      "áo dài nam",
-      "ngũ thân",
-      "mộc an",
-      "linen"
-    ],
-    "asset": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mfqu7wovd7v130",
-    "source_ids": [
-      "N1"
-    ],
-    "status": "draft",
-    "brand": {
-      "name": "Mộc An ÁO DÀI",
-      "location": "Thành phố Hà Nội",
-      "url": "https://shopee.vn/%C3%81o-d%C3%A0i-nam-truy%E1%BB%81n-th%E1%BB%91ng-M%E1%BB%98C-AN-ki%E1%BB%83u-d%C3%A1ng-ng%C5%A9-th%C3%A2n-form-chu%E1%BA%A9n-v%E1%BA%A3i-cao-c%E1%BA%A5p-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-i.1187942782.27266146257?extraParams=%7B%22display_model_id%22%3A187940095212%2C%22model_selection_logic%22%3A3%7D"
-    },
-    "pricing": {
-      "buy_price": 400000,
-      "currency": "VND",
-      "is_estimate": false,
-      "note": "Sản phẩm may sẵn bán trên sàn Shopee (mua trực tiếp, không hỗ trợ cho thuê hoặc may đo riêng)",
-      "pricing_type": "may_san_tmdt"
-    },
-    "material": "Vải linen cao cấp",
-    "craftsmanship_lore": "Áo dài ngũ thân truyền thống kết hợp chất liệu linen hiện đại mang lại vẻ đẹp lịch lãm, tôn vinh giá trị may mặc cổ truyền Việt Nam.",
-    "channel": "san_tmdt_shopee",
-    "origin_url": "https://shopee.vn/%C3%81o-d%C3%A0i-nam-truy%E1%BB%81n-th%E1%BB%91ng-M%E1%BB%98C-AN-ki%E1%BB%83u-d%C3%A1ng-ng%C5%A9-th%C3%A2n-form-chu%E1%BA%A9n-v%E1%BA%A3i-cao-c%E1%BA%A5p-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-i.1187942782.27266146257?extraParams=%7B%22display_model_id%22%3A187940095212%2C%22model_selection_logic%22%3A3%7D"
-  },
-  {
     "id": "ao_ngu_than_nam_xanh_01",
     "slot": "top",
     "group": "ao_ngu_than",
@@ -99,6 +49,56 @@
     },
     "material": "Lụa tơ tằm dệt hoa mây thủ công",
     "craftsmanship_lore": "May thủ công phom áo năm thân tay chẽn thời Nguyễn, cài 5 khuy đồng đúc tượng trưng cho Ngũ thường."
+  },
+  {
+    "id": "ao_ngu_than_moc_an_01",
+    "slot": "top",
+    "group": "ao_ngu_than",
+    "name_vi": "Áo dài nam ngũ thân truyền thống Mộc An vải linen cao cấp",
+    "gender": "nam",
+    "colors": [
+      {
+        "name": "Đỏ",
+        "hex": "#B5362B"
+      }
+    ],
+    "formality": 4,
+    "occasions": [
+      "tet",
+      "ky_yeu",
+      "di_le",
+      "bieu_dien"
+    ],
+    "style_levels": [
+      "truyen_thong"
+    ],
+    "tags": [
+      "áo dài nam",
+      "ngũ thân",
+      "mộc an",
+      "linen"
+    ],
+    "asset": "/uploads/cropped_custom_1791458448227_1791458448564_s344yk.png",
+    "source_ids": [
+      "N1"
+    ],
+    "status": "draft",
+    "brand": {
+      "name": "Mộc An ÁO DÀI",
+      "location": "Thành phố Hà Nội",
+      "url": "https://shopee.vn/%C3%81o-d%C3%A0i-nam-truy%E1%BB%81n-th%E1%BB%91ng-M%E1%BB%98C-AN-ki%E1%BB%83u-d%C3%A1ng-ng%C5%A9-th%C3%A2n-form-chu%E1%BA%A9n-v%E1%BA%A3i-cao-c%E1%BA%A5p-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-i.1187942782.27266146257?extraParams=%7B%22display_model_id%22%3A187940095212%2C%22model_selection_logic%22%3A3%7D"
+    },
+    "pricing": {
+      "buy_price": 400000,
+      "currency": "VND",
+      "is_estimate": false,
+      "note": "Sản phẩm may sẵn bán trên sàn Shopee (mua trực tiếp, không hỗ trợ cho thuê hoặc may đo riêng)",
+      "pricing_type": "may_san_tmdt"
+    },
+    "material": "Vải linen cao cấp",
+    "craftsmanship_lore": "Áo dài ngũ thân truyền thống kết hợp chất liệu linen hiện đại mang lại vẻ đẹp lịch lãm, tôn vinh giá trị may mặc cổ truyền Việt Nam.",
+    "channel": "san_tmdt_shopee",
+    "origin_url": "https://shopee.vn/%C3%81o-d%C3%A0i-nam-truy%E1%BB%81n-th%E1%BB%91ng-M%E1%BB%98C-AN-ki%E1%BB%83u-d%C3%A1ng-ng%C5%A9-th%C3%A2n-form-chu%E1%BA%A9n-v%E1%BA%A3i-cao-c%E1%BA%A5p-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-i.1187942782.27266146257?extraParams=%7B%22display_model_id%22%3A187940095212%2C%22model_selection_logic%22%3A3%7D"
   },
   {
     "id": "quan_trang_01",
@@ -578,5 +578,99 @@
     },
     "material": "Vải đũi thô nhuộm củ nâu truyền thống",
     "craftsmanship_lore": "Bốn vạt áo mộc mạc biểu trưng cho bốn đức tính tốt đẹp của phụ nữ Việt."
+  },
+  {
+    "id": "quan_den_01",
+    "slot": "bottom",
+    "group": "ao_ngu_than",
+    "name_vi": "Quần lụa đen ống suông truyền thống",
+    "gender": "unisex",
+    "colors": [
+      {
+        "name": "den_tuyen",
+        "hex": "#1A1A1A"
+      }
+    ],
+    "formality": 3,
+    "occasions": [
+      "di_le",
+      "ky_yeu",
+      "tet",
+      "dao_pho",
+      "bieu_dien"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe",
+      "phoi_hien_dai"
+    ],
+    "tags": [
+      "kin_dao",
+      "mau_tram"
+    ],
+    "asset": "/assets/items/quan_trang_01.png",
+    "source_ids": [
+      "N1"
+    ],
+    "status": "draft",
+    "brand": {
+      "name": "Lụa Vạn Phúc",
+      "location": "Hà Đông"
+    },
+    "pricing": {
+      "buy_price": 1850000,
+      "rental_price": 150000,
+      "currency": "VND",
+      "is_estimate": true,
+      "note": "Quần lụa tơ tằm nhuộm đen truyền thống cạp cao"
+    },
+    "material": "Lụa tơ tằm dệt trơn dập ly",
+    "craftsmanship_lore": "Quần lụa đen mang vẻ đẹp thâm trầm, tôn phom dáng cho cả áo ngũ thân và áo tấc."
+  },
+  {
+    "id": "quat_nan_tre_01",
+    "slot": "bag",
+    "group": "phu_kien",
+    "name_vi": "Quạt xếp nan tre vẽ thư pháp",
+    "gender": "unisex",
+    "colors": [
+      {
+        "name": "tre_moc",
+        "hex": "#C2A679"
+      }
+    ],
+    "formality": 2,
+    "occasions": [
+      "dao_pho",
+      "di_le",
+      "ky_yeu",
+      "tet",
+      "bieu_dien"
+    ],
+    "style_levels": [
+      "truyen_thong",
+      "cach_tan_nhe"
+    ],
+    "tags": [
+      "co_dien",
+      "phu_kien_truyen_thong"
+    ],
+    "asset": "/assets/items/tote_kem_01.png",
+    "source_ids": [
+      "N1"
+    ],
+    "status": "draft",
+    "brand": {
+      "name": "Thủ Công Mỹ Nghệ Chàng Sơn",
+      "location": "Hà Nội"
+    },
+    "pricing": {
+      "buy_price": 280000,
+      "currency": "VND",
+      "is_estimate": false,
+      "note": "Quạt nan tre thủ công bồi giấy dó vẽ chữ Nôm"
+    },
+    "material": "Nan tre ngâm kỹ, giấy dó bồi thủ công",
+    "craftsmanship_lore": "Phụ kiện cầm tay tao nhã của danh sĩ xưa khi dạo bước chiêm bái hoặc vãng cảnh."
   }
 ]

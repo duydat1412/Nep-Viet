@@ -53,6 +53,13 @@ export function runEngine(input: { occasion: string, group: string, gender: stri
 
     if (input.tone) {
       const targetTone = input.tone;
+      const aTop = a.combo.items.find(i => i.slot === 'top');
+      const bTop = b.combo.items.find(i => i.slot === 'top');
+      const aTopMatch = aTop?.tags?.includes('mau_' + targetTone) || aTop?.tags?.includes(targetTone);
+      const bTopMatch = bTop?.tags?.includes('mau_' + targetTone) || bTop?.tags?.includes(targetTone);
+      if (aTopMatch && !bTopMatch) return -1;
+      if (!aTopMatch && bTopMatch) return 1;
+
       const aToneMatch = a.combo.items.some(i => i.tags?.includes('mau_' + targetTone) || i.tags?.includes(targetTone));
       const bToneMatch = b.combo.items.some(i => i.tags?.includes('mau_' + targetTone) || i.tags?.includes(targetTone));
       if (aToneMatch && !bToneMatch) return -1;

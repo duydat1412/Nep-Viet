@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { 
   Sparkles, 
   Check, 
@@ -17,13 +17,18 @@ import {
   ShieldCheck,
   Eye,
   Camera,
-  BookOpen
+  BookOpen,
+  Scissors
 } from "lucide-react";
 import LookbookCard from "@/components/lookbook/LookbookCard";
 import { LoadingSkeleton, ErrorCard, ChuaDuCanCuCard, FallbackBanner } from "@/components/lookbook/CardStates";
 import HeritageSourcesModal from "@/components/codex/HeritageSourcesModal";
 import SavedLooksModal from "@/components/lookbook/SavedLooksModal";
 import { getSavedLooks } from "@/lib/storage/favorites";
+import FittingStudio from "@/components/studio/FittingStudio";
+import { calculateHarmony } from "@/lib/engine/harmony";
+import { evaluateRules } from "@/lib/engine/rules";
+import itemsData from "@/../data/items.json";
 
 export default function Home() {
   // Styling Studio States
@@ -47,6 +52,135 @@ export default function Home() {
   // Saved Looks (Tủ đồ yêu thích trên máy) State
   const [savedLooksOpen, setSavedLooksOpen] = useState(false);
   const [savedCount, setSavedCount] = useState(0);
+
+  // Mode Switcher: Fitting Studio vs AI Wizard
+  const [creationMode, setCreationMode] = useState<"fitting" | "wizard">("fitting");
+  const [catalogItems, setCatalogItems] = useState<any[]>(itemsData as any[]);
+  const [fittingTop, setFittingTop] = useState<any>(() => 
+    (itemsData as any[]).find((i) => i.id === "ao_ngu_than_nam_xanh_01") ||
+    (itemsData as any[]).find((i) => i.slot === "top")
+  );
+  const [fittingBottom, setFittingBottom] = useState<any>(() => 
+    (itemsData as any[]).find((i) => i.id === "quan_trang_01") ||
+    (itemsData as any[]).find((i) => i.slot === "bottom")
+  );
+  const [fittingFootwear, setFittingFootwear] = useState<any>(() => 
+    (itemsData as any[]).find((i) => i.id === "guoc_moc_01") ||
+    (itemsData as any[]).find((i) => i.slot === "footwear")
+  );
+  const [fittingAccessory, setFittingAccessory] = useState<any>(() => 
+    (itemsData as any[]).find((i) => i.id === "tote_kem_01") ||
+    (itemsData as any[]).find((i) => !["top", "bottom", "footwear"].includes(i.slot))
+  );
+  const [hasAccessory, setHasAccessory] = useState(true);
+  const [customLyDo, setCustomLyDo] = useState<string | null>(null);
+  const [customLore, setCustomLore] = useState<string | null>(null);
+  const [aiLoreLoading, setAiLoreLoading] = useState(false);
+
+  // Sync catalog with newly ingested products from Shopee/Admin
+  useEffect(() => {
+    fetch("/api/admin/products")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data?.products && Array.isArray(data.products) && data.products.length > 0) {
+          setCatalogItems(data.products);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Fitting Studio real-time calculations
+  const fittingItems = useMemo(() => {
+    const list = [fittingTop, fittingBottom, fittingFootwear].filter(Boolean);
+    if (hasAccessory && fittingAccessory) {
+      list.push(fittingAccessory);
+    }
+    return list;
+  }, [fittingTop, fittingBottom, fittingFootwear, fittingAccessory, hasAccessory]);
+
+  const fittingHarmony = useMemo(() => {
+    const colors = fittingItems.flatMap((i) => i.colors || []);
+    if (colors.length === 0) return { score: 9.0, label: "Hài hòa", description: "Bảng màu cân đối tự nhiên" };
+    return calculateHarmony(colors);
+  }, [fittingItems]);
+
+  const fittingRules = useMemo(() => {
+    const fakeCombo = {
+      combo_id: "custom_fitting",
+      item_ids: fittingItems.map((i) => i.id),
+      items: fittingItems,
+      style_level: styleLevel,
+    };
+    return evaluateRules(fakeCombo, occasion, styleLevel);
+  }, [fittingItems, occasion, styleLevel]);
+
+  const fittingResult = useMemo(() => {
+    return {
+      combo_id: `custom_fitting_${fittingTop?.id || "top"}_${fittingBottom?.id || "bot"}`,
+      outfit_item_ids: fittingItems.map((i) => i.id),
+      muc_canh_bao: fittingRules.level as any,
+      diem_hai_hoa_mau: fittingHarmony.score,
+      ly_do_phoi_do: customLyDo || `Bộ phối tự do từ Kho Di Sản kết hợp hài hòa ${fittingItems.map(i => i.name_vi).join(" + ")}.`,
+      nhan_xet_mau: fittingHarmony.description || `Đạt ${fittingHarmony.score}/10 điểm hòa sắc (${fittingHarmony.label}).`,
+      dien_giai_van_hoa: customLore || fittingTop?.craftsmanship_lore || "Trang phục giữ gìn nếp xưa đoan chính kết hợp nét tân thời trang nhã.",
+      source_ids: fittingTop?.source_ids || ["N1", "S_HN1665"],
+      triggered_rules: fittingRules.triggered_rules || [],
+      items: fittingItems,
+    };
+  }, [fittingItems, fittingRules, fittingHarmony, customLyDo, customLore, fittingTop, fittingBottom]);
+
+  const handleShuffle = () => {
+    const tops = catalogItems.filter((i) => i.slot === "top");
+    const bottoms = catalogItems.filter((i) => i.slot === "bottom");
+    const shoes = catalogItems.filter((i) => i.slot === "footwear");
+    const accessories = catalogItems.filter((i) => !["top", "bottom", "footwear"].includes(i.slot));
+
+    if (tops.length > 0) setFittingTop(tops[Math.floor(Math.random() * tops.length)]);
+    if (bottoms.length > 0) setFittingBottom(bottoms[Math.floor(Math.random() * bottoms.length)]);
+    if (shoes.length > 0) setFittingFootwear(shoes[Math.floor(Math.random() * shoes.length)]);
+    if (accessories.length > 0 && hasAccessory) setFittingAccessory(accessories[Math.floor(Math.random() * accessories.length)]);
+    setCustomLyDo(null);
+    setCustomLore(null);
+  };
+
+  const handleResetFitting = () => {
+    const defaultTop = catalogItems.find((i) => i.id === "ao_ngu_than_nam_xanh_01") || catalogItems.find((i) => i.slot === "top");
+    const defaultBottom = catalogItems.find((i) => i.id === "quan_trang_01") || catalogItems.find((i) => i.slot === "bottom");
+    const defaultShoes = catalogItems.find((i) => i.id === "guoc_moc_01") || catalogItems.find((i) => i.slot === "footwear");
+    const defaultAcc = catalogItems.find((i) => i.id === "tote_kem_01") || catalogItems.find((i) => !["top", "bottom", "footwear"].includes(i.slot));
+    setFittingTop(defaultTop);
+    setFittingBottom(defaultBottom);
+    setFittingFootwear(defaultShoes);
+    setFittingAccessory(defaultAcc);
+    setHasAccessory(true);
+    setCustomLyDo(null);
+    setCustomLore(null);
+  };
+
+  const handleRequestAiLore = async () => {
+    setAiLoreLoading(true);
+    try {
+      const res = await fetch("/api/recommend/interpret", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          occasion,
+          items: fittingItems,
+          harmony: fittingHarmony,
+          rules: fittingRules,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (data.ly_do_phoi_do) setCustomLyDo(data.ly_do_phoi_do);
+        if (data.dien_giai_van_hoa) setCustomLore(data.dien_giai_van_hoa);
+      }
+    } catch (err) {
+      console.error("AI lore error:", err);
+    } finally {
+      setAiLoreLoading(false);
+    }
+  };
 
   useEffect(() => {
     const updateCount = () => {
@@ -369,11 +503,96 @@ export default function Home() {
           {/* 3. MAIN SPLIT ATELIER GRID (Two Columns Layout) */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             
-            {/* CỘT TRÁI: 4-Step Interactive Styling Studio (~58%) */}
+            {/* CỘT TRÁI: Interactive Styling Studio / Fitting Room (~58%) */}
             <section className="lg:col-span-7 flex flex-col gap-6">
               
-              {/* Step Navigation Progress Tabs */}
-              <div className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-nep-ink/5">
+              {/* CHUYỂN ĐỔI CHẾ ĐỘ TẠO LOOKBOOK */}
+              <div className="bg-surface-container-lowest p-2 rounded-2xl shadow-sm border border-nep-ink/10 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setCreationMode("fitting")}
+                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      creationMode === "fitting"
+                        ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container"
+                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+                    }`}
+                  >
+                    <Scissors className="w-4 h-4 text-nep-gold" />
+                    <span>Ướm Thử Từng Món (Fitting Studio)</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Mới</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCreationMode("wizard")}
+                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      creationMode === "wizard"
+                        ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container"
+                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+                    }`}
+                  >
+                    <Sparkles className="w-4 h-4 text-nep-gold" />
+                    <span>Trợ Lý AI Gợi Ý (AI Stylist 4 Bước)</span>
+                  </button>
+                </div>
+
+                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-on-surface-variant px-3 py-1 bg-surface-container-low rounded-xl">
+                  {creationMode === "fitting" ? (
+                    <span>💡 Ướm thử trực tiếp từng món &amp; xem thẻ Lookbook song song</span>
+                  ) : (
+                    <span>🤖 AI tự động phối theo ngữ cảnh &amp; quy chuẩn</span>
+                  )}
+                </div>
+              </div>
+
+              {creationMode === "fitting" ? (
+                <FittingStudio
+                  items={catalogItems}
+                  selectedTop={fittingTop}
+                  selectedBottom={fittingBottom}
+                  selectedFootwear={fittingFootwear}
+                  selectedAccessory={fittingAccessory}
+                  hasAccessory={hasAccessory}
+                  onSelectTop={(item) => {
+                    setFittingTop(item);
+                    setCustomLyDo(null);
+                    setCustomLore(null);
+                  }}
+                  onSelectBottom={(item) => {
+                    setFittingBottom(item);
+                    setCustomLyDo(null);
+                    setCustomLore(null);
+                  }}
+                  onSelectFootwear={(item) => {
+                    setFittingFootwear(item);
+                    setCustomLyDo(null);
+                    setCustomLore(null);
+                  }}
+                  onSelectAccessory={(item) => {
+                    setFittingAccessory(item);
+                    setCustomLyDo(null);
+                    setCustomLore(null);
+                  }}
+                  onToggleAccessory={(enabled) => {
+                    setHasAccessory(enabled);
+                    setCustomLyDo(null);
+                    setCustomLore(null);
+                  }}
+                  onShuffle={handleShuffle}
+                  onReset={handleResetFitting}
+                  occasion={occasion}
+                  onChangeOccasion={(occ) => setOccasion(occ)}
+                  harmonyResult={fittingHarmony}
+                  rulesResult={fittingRules}
+                  onRequestAiLore={handleRequestAiLore}
+                  aiLoreLoading={aiLoreLoading}
+                  customLore={customLore || undefined}
+                />
+              ) : (
+                <>
+                  {/* Step Navigation Progress Tabs */}
+                  <div className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-nep-ink/5">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
                   <div className="flex flex-col text-left">
                     <span className="text-[10px] font-bold text-primary tracking-wider uppercase font-mono">01. NGỮ CẢNH DỊP</span>
@@ -678,13 +897,29 @@ export default function Home() {
                     <span>Tra Cứu Điển Thư</span>
                   </button>
                 </div>
-            </section>
+              </>
+            )}
+          </section>
 
-            {/* CỘT PHẢI: 9:16 Editorial Lookbook Card (~42% Sticky) */}
-            <aside id="lookbook" className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
-              {loading ? (
-                <LoadingSkeleton />
-              ) : error ? (
+          {/* CỘT PHẢI: 9:16 Editorial Lookbook Card (~42% Sticky) */}
+          <aside id="lookbook" className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
+            {creationMode === "fitting" ? (
+              <div className="flex flex-col items-center w-full">
+                <div className="w-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-semibold text-center py-1.5 px-3 rounded-full mb-2 flex items-center justify-center gap-2 shadow-2xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                  <span className="font-bold">ƯỚM THỬ TRỰC TIẾP · LIVE PREVIEW SONG SONG (0ms)</span>
+                </div>
+                <LookbookCard
+                  onOpenSource={(srcId) => {
+                    setFocusedSourceId(srcId);
+                    setCodexOpen(true);
+                  }}
+                  result={fittingResult}
+                />
+              </div>
+            ) : loading ? (
+              <LoadingSkeleton />
+            ) : error ? (
                 <ErrorCard message={error} onRetry={() => handleGenerate()} />
               ) : result ? (
                 result.trang_thai === "CHUA_DU_CAN_CU" ? (

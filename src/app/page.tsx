@@ -437,55 +437,79 @@ export default function Home() {
           
           {/* 2. EDITORIAL HERO BANNER */}
           <header className="mb-10 relative pt-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-primary-container inline-block animate-pulse"></span>
-                <span className="text-[11px] uppercase tracking-widest text-primary-container font-bold font-mono">
-                  DI SẢN TRIỀU NGUYỄN &amp; HƠI THỞ ĐƯƠNG ĐẠI · ATELIER GIÁM TUYỂN
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
-                className="flex items-center gap-1.5 bg-surface-container-high hover:bg-surface-container-highest px-3 py-1 rounded-full shadow-2xs transition-colors cursor-pointer group"
-                title="Nhấn để xem Điển Thư & Danh Mục Nguồn Khảo Cứu"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-secondary group-hover:scale-110 transition-transform" />
-                <span className="text-[11px] font-semibold text-on-surface">Đối Chiếu Điển Chế &amp; Quy Tắc Văn Hóa</span>
-                <span className="text-[10px] text-primary font-mono font-bold">↗</span>
-              </button>
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              {/* CỘT TRÁI: Editorial Title & Storytelling (~60%) */}
+              <div className="lg:col-span-7 flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-primary inline-block animate-pulse"></span>
+                  <span className="text-[11px] uppercase tracking-widest text-primary font-bold font-mono">
+                    ❖ DI SẢN Y PHỤC VIỆT · HƠI THỞ ĐƯƠNG ĐẠI
+                  </span>
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-              <div className="lg:col-span-7">
                 <h1 className="font-heading text-4xl lg:text-5xl text-on-surface tracking-tight font-extrabold leading-tight">
-                  Nếp Áo Thời Gian <span className="italic font-normal text-secondary font-heading text-3xl lg:text-4xl">— Giám Tuyển Cổ Phục</span>
+                  Gìn Nếp Xưa, Dệt Nét Riêng{" "}
+                  <span className="italic font-normal text-secondary font-heading text-3xl lg:text-4xl block sm:inline mt-1 sm:mt-0">
+                    — Không Gian Giám Tuyển Cổ Phục
+                  </span>
                 </h1>
-                <p className="text-sm lg:text-base text-on-surface-variant max-w-2xl mt-2 leading-relaxed">
-                  Lựa chọn ướm thử từng bộ phận từ album di sản hoặc điền form nhu cầu để AI tự động phối theo điển chế và bảng màu chuẩn mực.
+
+                <p className="text-sm lg:text-base text-on-surface-variant max-w-2xl leading-relaxed mt-1">
+                  Giao hòa điển chế y phục cổ truyền cùng tư duy thẩm mỹ thế hệ mới. Tự do ướm phối từng nếp áo tà lụa từ album di sản hoặc để AI giám tuyển trọn bộ trang phục chuẩn mực theo bối cảnh, nghi lễ và quy luật hòa sắc.
                 </p>
               </div>
 
-              {/* Tóm tắt Công nghệ & Bảo chứng Di sản */}
-              <div className="lg:col-span-5 flex lg:justify-end">
-                <div className="flex flex-wrap sm:flex-nowrap lg:flex-wrap items-center gap-2 p-2.5 bg-surface-container-low rounded-2xl border border-nep-ink/10 text-xs">
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 text-nep-ink font-medium shadow-2xs">
-                    <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
-                    <span>Quang học HSL</span>
+              {/* CỘT PHẢI: Khung Bảo Chứng Di Sản & Công Nghệ AI (~40%) */}
+              <div className="lg:col-span-5">
+                <div className="bg-surface-container-low/80 backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-nep-ink/10 shadow-xs flex flex-col gap-3">
+                  <div className="flex items-center justify-between border-b border-nep-ink/5 pb-2">
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-secondary flex items-center gap-1.5">
+                      <span>❖</span> Bảo Chứng Di Sản &amp; Công Nghệ
+                    </span>
+                    <span className="text-[10px] font-mono text-on-surface-variant/70">AI Arena 2026</span>
                   </div>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 text-nep-ink font-medium shadow-2xs">
-                    <span className="w-2 h-2 rounded-full bg-amber-600 inline-block"></span>
-                    <span>Quy tắc Văn hóa 100%</span>
+
+                  <div className="grid grid-cols-1 gap-2 text-xs">
+                    <div className="flex items-start gap-2.5 p-2 rounded-xl bg-white/70">
+                      <span className="text-base shrink-0 leading-none">🛡️</span>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-nep-ink text-[12px]">Điển Chế Chuẩn Mực 100%</span>
+                        <span className="text-[11px] text-on-surface-variant">Khảo cứu sử liệu &amp; quy tắc nghi lễ cổ truyền</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 p-2 rounded-xl bg-white/70">
+                      <span className="text-base shrink-0 leading-none">🎨</span>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-nep-ink text-[12px]">Hòa Sắc Quang Học HSL</span>
+                        <span className="text-[11px] text-on-surface-variant">Thuật toán đối chiếu mỹ cảm dân gian &amp; thị giác</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-2.5 p-2 rounded-xl bg-white/70">
+                      <span className="text-base shrink-0 leading-none">⚡</span>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-nep-ink text-[12px]">Ướm Thử Trực Quan Live 0ms</span>
+                        <span className="text-[11px] text-on-surface-variant">Phản hồi thẻ Lookbook song song thời gian thực</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 text-nep-indigo font-medium shadow-2xs">
-                    <span className="w-2 h-2 rounded-full bg-nep-indigo inline-block"></span>
-                    <span>Trực quan Live 0ms</span>
-                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
+                    className="w-full mt-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-nep-ink text-xs font-semibold border border-nep-ink/5 transition-all cursor-pointer group shadow-2xs"
+                    title="Mở Điển Thư & Danh Mục Nguồn Khảo Cứu"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                    <span>Tra Cứu Điển Thư &amp; Nguồn Khảo Cứu</span>
+                    <span className="text-[11px] text-primary font-mono font-bold">↗</span>
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="w-full h-px bg-surface-container-highest mt-6 flex items-center justify-center">
+            <div className="w-full h-px bg-surface-container-highest mt-8 flex items-center justify-center">
               <span className="bg-surface px-4 text-secondary text-[10px] tracking-widest font-mono">❖ DẤU ẤN VĂN HIẾN ❖</span>
             </div>
           </header>

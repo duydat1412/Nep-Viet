@@ -96,7 +96,7 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
     <div className="flex flex-col items-center">
       <div 
         ref={cardRef} 
-        className="relative bg-nep-paper w-[360px] min-h-[690px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-5 transition-all duration-300"
+        className="relative bg-nep-paper w-full max-w-[360px] min-h-[690px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-5 transition-all duration-300"
       >
         {/* Dấu Triện (Imperial Seal Stamp) Accent - Ước lệ mỹ thuật */}
         <div className="absolute top-4 right-4 z-20 flex flex-col items-center select-none pointer-events-none" title="Ấn triện thương hiệu Nếp Việt">

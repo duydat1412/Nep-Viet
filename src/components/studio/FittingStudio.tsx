@@ -19,6 +19,28 @@ import {
 } from "lucide-react";
 import { TriggeredRule } from "@/lib/engine/rules";
 
+function getVietnameseBadge(group?: string, slot?: string): string {
+  const groupMap: Record<string, string> = {
+    ao_ngu_than: "Ngũ Thân",
+    ao_tac: "Áo Tấc",
+    ao_dai: "Áo Dài",
+    ao_tu_than: "Tứ Thân",
+    ao_nhat_binh: "Nhật Bình",
+    phu_kien: "Phụ Kiện",
+  };
+  const slotMap: Record<string, string> = {
+    top: "Áo Chính",
+    bottom: "Quần",
+    footwear: "Giày/Guốc",
+    bag: "Túi Xách",
+    headwear: "Khăn/Mũ",
+    jewelry: "Trang Sức",
+  };
+  const g = group ? (groupMap[group] || group) : "";
+  const s = slot ? (slotMap[slot] || slot) : "";
+  return g && s ? `${g} · ${s}` : g || s;
+}
+
 export interface FittingStudioProps {
   items: any[];
   selectedTop: any;
@@ -153,14 +175,14 @@ export default function FittingStudio({
               <Scissors className="w-4 h-4" />
             </span>
             <h2 className="font-heading text-lg font-bold text-nep-ink">
-              Tủ Đồ Ướm Thử Tự Do (Fitting Studio)
+              Xưởng Ướm Thử Tự Do
             </h2>
             <span className="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
               Live Preview
             </span>
           </div>
           <p className="text-xs text-nep-ink/65 mt-1 leading-relaxed">
-            Chọn riêng từng Áo, Quần, Giày &amp; Phụ kiện từ Kho Album. Diện mạo Lookbook bên phải sẽ cập nhật tức thời theo thời gian thực!
+            Tự tay ghép riêng từng Áo, Quần, Guốc &amp; Phụ kiện từ Kho Album. Diện mạo Lookbook bên phải cập nhật tức thời theo thời gian thực.
           </p>
         </div>
 
@@ -511,7 +533,7 @@ export default function FittingStudio({
                   {/* Title & Group */}
                   <div className="flex items-center justify-between gap-1 mb-1">
                     <span className="text-[9px] font-bold uppercase tracking-wider font-mono text-nep-red">
-                      {item.group} · {item.slot}
+                      {getVietnameseBadge(item.group, item.slot)}
                     </span>
                     {isShopee ? (
                       <span className="text-[9px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">

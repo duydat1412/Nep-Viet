@@ -56,7 +56,7 @@ describe('Color Harmony', () => {
 
 describe('Combo Builder', () => {
   it('builds valid combos with correct slots', () => {
-    const items = itemsData?.items || [];
+    const items = (Array.isArray(itemsData) ? itemsData : (itemsData as any)?.items) || [];
     const combos = buildCombos(items, 'di_le', 'ao_ngu_than', 'nam', 'truyen_thong');
     if (combos.length > 0) {
       expect(combos[0].items.some(i => i.slot === 'top')).toBe(true);
@@ -68,7 +68,7 @@ describe('Combo Builder', () => {
 
 describe('Rule Evaluator', () => {
   it('evaluates rules correctly', () => {
-    const items = itemsData?.items || [];
+    const items = (Array.isArray(itemsData) ? itemsData : (itemsData as any)?.items) || [];
     const combos = buildCombos(items, 'di_le', 'ao_ngu_than', 'nam', 'truyen_thong');
     if (combos.length > 0) {
       const res = evaluateRules(combos[0], 'di_le', 'truyen_thong');

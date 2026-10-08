@@ -33,7 +33,7 @@ describe('Vertical Slice 3 Mandatory Outcomes', () => {
     expect(res.combos_with_scores.length).toBeGreaterThan(0);
     const top = res.combos_with_scores[0];
     expect(top.rules_result.level).toBe('VANG');
-    expect(top.rules_result.triggered_rules.some(r => r.id === 'R_DILE_03')).toBe(true);
+    expect(top.rules_result.triggered_rules.some((r: any) => r.id === 'R_DILE_03')).toBe(true);
     expect(top.combo.item_ids).toContain('sneaker_trang_01');
   });
 

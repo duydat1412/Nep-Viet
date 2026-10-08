@@ -7,8 +7,6 @@ import {
   ExternalLink, 
   Bookmark, 
   Share2, 
-  Volume2, 
-  VolumeX,
   Store,
   RotateCcw,
   Tag,
@@ -29,6 +27,7 @@ import FittingStudio from "@/components/studio/FittingStudio";
 import { calculateHarmony } from "@/lib/engine/harmony";
 import { evaluateRules } from "@/lib/engine/rules";
 import itemsData from "@/../data/items.json";
+import ToastContainer, { ToastMessage } from "@/components/ui/Toast";
 
 export default function Home() {
   // Styling Studio States
@@ -37,8 +36,15 @@ export default function Home() {
   const [gender, setGender] = useState<"nam" | "nu">("nam"); // nam, nu
   const [styleLevel, setStyleLevel] = useState("truyen_thong"); // truyen_thong, cach_tan_nhe, phoi_hien_dai
   const [colorway, setColorway] = useState("tram"); // tram, tuoi, pastel, ngu_hanh
-  const [audioPlaying, setAudioPlaying] = useState(false);
-  const [activeMode, setActiveMode] = useState("ceremonial");
+  // Toast Notification System
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const showToast = (toast: Omit<ToastMessage, "id">) => {
+    const id = `toast_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    setToasts((prev) => [...prev, { ...toast, id }]);
+  };
+  const dismissToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   // Codex & Source References State
   const [codexOpen, setCodexOpen] = useState(false);
@@ -174,9 +180,21 @@ export default function Home() {
       if (data.success) {
         if (data.ly_do_phoi_do) setCustomLyDo(data.ly_do_phoi_do);
         if (data.dien_giai_van_hoa) setCustomLore(data.dien_giai_van_hoa);
+        showToast({
+          type: "success",
+          title: "AI Diễn Giải Thành Công",
+          message: "Đã tạo lời bình văn hóa và nhận xét thẩm mỹ độc bản cho bộ phối của bạn.",
+          duration: 4000,
+        });
       }
     } catch (err) {
       console.error("AI lore error:", err);
+      showToast({
+        type: "error",
+        title: "Không Thể Diễn Giải",
+        message: "Máy chủ AI phản hồi chậm, vui lòng thử lại sau giây lát.",
+        duration: 3500,
+      });
     } finally {
       setAiLoreLoading(false);
     }
@@ -187,8 +205,26 @@ export default function Home() {
       setSavedCount(getSavedLooks().length);
     };
     updateCount();
-    window.addEventListener("nep_viet_favorites_updated", updateCount);
-    return () => window.removeEventListener("nep_viet_favorites_updated", updateCount);
+    const handleFavUpdate = (e: any) => {
+      updateCount();
+      if (e?.detail?.action === "saved") {
+        showToast({
+          type: "success",
+          title: "Đã Lưu Vào Tủ Đồ",
+          message: "Bản phối đã được lưu trữ an toàn trong tủ đồ cá nhân trên thiết bị của bạn.",
+          duration: 3500,
+        });
+      } else if (e?.detail?.action === "removed") {
+        showToast({
+          type: "info",
+          title: "Đã Gỡ Khỏi Tủ Đồ",
+          message: "Bản phối đã được xóa khỏi danh sách yêu thích.",
+          duration: 3000,
+        });
+      }
+    };
+    window.addEventListener("nep_viet_favorites_updated", handleFavUpdate);
+    return () => window.removeEventListener("nep_viet_favorites_updated", handleFavUpdate);
   }, []);
 
   // Form submit trigger
@@ -377,7 +413,7 @@ export default function Home() {
               }`}
             >
               <Scissors className="w-3.5 h-3.5 text-nep-gold" />
-              <span>Ướm Thử Từng Part</span>
+              <span>Ướm Thử Tự Do</span>
               <span className="text-[10px] px-1.5 py-0.2 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Live</span>
             </button>
 
@@ -395,62 +431,38 @@ export default function Home() {
               }`}
             >
               <Sparkles className="w-3.5 h-3.5 text-nep-gold" />
-              <span>Thiết Kế Tạo Nhu Cầu</span>
+              <span>AI Giám Tuyển</span>
             </button>
-
-            <div className="w-px h-4 bg-nep-ink/10 mx-0.5" />
-
-            <button
-              onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
-              type="button"
-              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-primary hover:bg-surface-container-high transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Điển Thư Khảo Cứu</span>
-            </button>
-            <a 
-              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors" 
-              href="/admin/ingest"
-            >
-              Admin Ingest
-            </a>
           </nav>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <button 
-              onClick={() => setAudioPlaying(!audioPlaying)}
-              type="button"
-              className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant text-xs transition-colors cursor-pointer"
-            >
-              {audioPlaying ? <Volume2 className="w-3.5 h-3.5 text-secondary animate-pulse" /> : <VolumeX className="w-3.5 h-3.5" />}
-              <span>{audioPlaying ? "Đang phát: Lưu Thủy" : "Nhã Nhạc Ambience"}</span>
-            </button>
-
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
               onClick={() => setSavedLooksOpen(true)}
               type="button"
-              className="px-3 py-1 rounded-full bg-amber-50 hover:bg-amber-100 font-mono text-[11px] font-bold text-amber-900 border border-amber-300/60 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
+              className="px-3.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 font-mono text-[11px] font-bold text-amber-900 border border-amber-300/60 flex items-center gap-1.5 cursor-pointer shadow-2xs transition-colors"
               title="Xem tủ đồ các bản phối đã lưu"
             >
-              <Bookmark className={`w-3 h-3 ${savedCount > 0 ? "fill-amber-700 text-amber-700" : "text-amber-800"}`} />
+              <Bookmark className={`w-3.5 h-3.5 ${savedCount > 0 ? "fill-amber-700 text-amber-700" : "text-amber-800"}`} />
               <span>Tủ Đồ ({savedCount})</span>
             </button>
 
             <button
               onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
               type="button"
-              className="px-3.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container-high font-mono text-[11px] font-bold text-nep-red border border-nep-red/20 flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container-high font-mono text-[11px] font-bold text-nep-red border border-nep-red/20 flex items-center gap-1.5 cursor-pointer transition-colors"
+              title="Mở Điển Thư & Danh Mục Nguồn Khảo Cứu"
             >
-              <BookOpen className="w-3 h-3" />
-              <span>Nguồn Tư Liệu</span>
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Điển Thư Khảo Cứu</span>
             </button>
 
             <a 
               href="/admin/ingest"
-              className="px-3.5 py-1 rounded-full bg-surface-container-low hover:bg-surface-container-high font-mono text-[11px] font-bold text-nep-indigo border border-nep-indigo/20 flex items-center gap-1"
+              className="px-3.5 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container-high font-mono text-[11px] font-bold text-nep-indigo border border-nep-indigo/20 flex items-center gap-1.5 transition-colors"
+              title="Quản lý & cào sản phẩm"
             >
-              <Store className="w-3 h-3" />
-              <span>Admin Studio</span>
+              <Store className="w-3.5 h-3.5" />
+              <span>Admin Ingest</span>
             </a>
           </div>
         </div>
@@ -466,11 +478,7 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-primary-container inline-block animate-pulse"></span>
                 <span className="text-[11px] uppercase tracking-widest text-primary-container font-bold font-mono">
-                  BỘ ĐÔI DI SẢN &amp; ĐƯƠNG ĐẠI · THE HERITAGE ATELIER
-                </span>
-                <span className="text-secondary text-xs">✦</span>
-                <span className="text-[11px] uppercase tracking-wider text-on-surface-variant font-medium">
-                  Phòng Giám Tuyển Số 04
+                  DI SẢN TRIỀU NGUYỄN &amp; HƠI THỞ ĐƯƠNG ĐẠI · ATELIER GIÁM TUYỂN
                 </span>
               </div>
               <button
@@ -495,7 +503,7 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* 2 Cách Tạo Lookbook: Ướm Thử Từng Part vs Thiết Kế Tạo Nhu Cầu */}
+              {/* 2 Phương Thức Tạo Lookbook: Ướm Thử Tự Do vs AI Giám Tuyển */}
               <div className="lg:col-span-6 flex lg:justify-end">
                 <div className="inline-flex p-1.5 bg-surface-container-low rounded-2xl gap-1.5 shadow-sm border border-nep-ink/10 w-full sm:w-auto">
                   <button 
@@ -512,7 +520,7 @@ export default function Home() {
                     }`}
                   >
                     <Scissors className="w-4 h-4 text-nep-gold" />
-                    <span>Cách 1: Chọn Từng Part (Ướm Thử)</span>
+                    <span>Ướm Thử Tự Do</span>
                     <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Live 0ms</span>
                   </button>
                   <button 
@@ -529,7 +537,7 @@ export default function Home() {
                     }`}
                   >
                     <Sparkles className="w-4 h-4 text-nep-gold" />
-                    <span>Cách 2: Thiết Kế Tạo Nhu Cầu (Điền Form)</span>
+                    <span>AI Giám Tuyển</span>
                   </button>
                 </div>
               </div>
@@ -559,8 +567,8 @@ export default function Home() {
                     }`}
                   >
                     <Scissors className="w-4 h-4 text-nep-gold" />
-                    <span>Cách 1: Chọn Từng Part (Ướm Thử)</span>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Mới</span>
+                    <span>Ướm Thử Tự Do</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Trực quan</span>
                   </button>
 
                   <button
@@ -573,15 +581,15 @@ export default function Home() {
                     }`}
                   >
                     <Sparkles className="w-4 h-4 text-nep-gold" />
-                    <span>Cách 2: Thiết Kế Tạo Nhu Cầu (Điền Form AI)</span>
+                    <span>AI Giám Tuyển</span>
                   </button>
                 </div>
 
                 <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-on-surface-variant px-3 py-1 bg-surface-container-low rounded-xl">
                   {creationMode === "fitting" ? (
-                    <span>💡 Ướm thử trực tiếp từng món &amp; xem thẻ Lookbook song song</span>
+                    <span>💡 Tự do ghép từng món &amp; xem thẻ Lookbook cập nhật song song</span>
                   ) : (
-                    <span>🤖 AI tự động phối theo ngữ cảnh &amp; quy chuẩn</span>
+                    <span>🤖 AI giám tuyển bộ phối toàn diện theo điển chế &amp; nhu cầu</span>
                   )}
                 </div>
               </div>
@@ -1076,10 +1084,10 @@ export default function Home() {
 
               <div className="md:col-span-4 flex flex-col sm:items-end justify-center bg-surface-container-lowest/60 p-4 rounded-xl backdrop-blur-sm border border-nep-ink/5">
                 <div className="flex items-center gap-1.5 text-secondary mb-1">
-                  <span className="text-xs font-bold uppercase tracking-wider font-mono">Âm Thanh Không Gian</span>
+                  <span className="text-xs font-bold uppercase tracking-wider font-mono">Chuẩn Điển Chế Khảo Cứu</span>
                 </div>
-                <span className="text-xs text-on-surface font-semibold text-right">Đàn Tranh x Lo-fi Beat: Tiếng Thu Hà Nội</span>
-                <span className="text-[10px] text-on-surface-variant mt-0.5">Bản phối độc quyền cho Nếp Việt Atelier</span>
+                <span className="text-xs text-on-surface font-semibold text-right">Đại Nam Thực Lục &amp; Hội Điển Sự Lệ</span>
+                <span className="text-[10px] text-on-surface-variant mt-0.5">Tư liệu lịch sử đối chiếu chuẩn mực cho Atelier</span>
               </div>
             </div>
           </footer>
@@ -1112,7 +1120,7 @@ export default function Home() {
                 }}
                 className="text-left text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
               >
-                Ướm Thử Từng Part
+                Ướm Thử Tự Do
               </button>
               <button
                 type="button"
@@ -1123,13 +1131,13 @@ export default function Home() {
                 }}
                 className="text-left text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
               >
-                Thiết Kế Tạo Nhu Cầu
+                AI Giám Tuyển
               </button>
               <a href="/admin/ingest" className="text-on-surface-variant hover:text-primary transition-colors">Admin Ingest Sản Phẩm</a>
             </div>
 
             <div className="md:col-span-2 flex flex-col gap-1.5 text-xs">
-              <span className="uppercase tracking-wider font-bold text-on-surface mb-1 font-mono text-[11px]">Di Sản &amp; Làng Nghề</span>
+              <span className="uppercase tracking-wider font-bold text-on-surface mb-1 font-mono text-[11px]">Di Sản &amp; Điển Thư</span>
               <button
                 type="button"
                 onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
@@ -1137,8 +1145,20 @@ export default function Home() {
               >
                 Điển Thư &amp; Nguồn Khảo Cứu
               </button>
-              <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">Nghệ Nhân Dệt May</a>
-              <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">Triết Lý Giấy Dó</a>
+              <button
+                type="button"
+                onClick={() => setSavedLooksOpen(true)}
+                className="text-left text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+              >
+                Tủ Đồ Đã Lưu ({savedCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => { setFocusedSourceId("S_HN1665"); setCodexOpen(true); }}
+                className="text-left text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+              >
+                Quy Chuẩn Áo Ngũ Thân
+              </button>
             </div>
 
             <div className="md:col-span-3 flex flex-col gap-1.5 text-xs">
@@ -1177,6 +1197,9 @@ export default function Home() {
           el?.scrollIntoView({ behavior: "smooth" });
         }}
       />
+
+      {/* 8. TOAST NOTIFICATION CONTAINER */}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

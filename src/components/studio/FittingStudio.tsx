@@ -286,9 +286,21 @@ export default function FittingStudio({
                   <span>{slotItem.name}</span>
                 </span>
                 {slotItem.optional && (
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-nep-indigo bg-nep-indigo/10 px-1.5 py-0.2 rounded-md">
-                    Tùy chọn
-                  </span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleAccessory(!hasAccessory);
+                    }}
+                    className={`text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md transition-colors cursor-pointer border ${
+                      hasAccessory
+                        ? "bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200"
+                        : "bg-gray-100 text-gray-600 border-gray-300 hover:bg-gray-200"
+                    }`}
+                    title={hasAccessory ? "Nhấn để tắt phụ kiện" : "Nhấn để bật phụ kiện"}
+                  >
+                    {hasAccessory ? "✓ Đang Bật" : "✕ Đã Tắt"}
+                  </button>
                 )}
               </div>
 
@@ -322,89 +334,111 @@ export default function FittingStudio({
       </div>
 
       {/* 4. SUB-FILTERS & TOGGLE BAR FOR ACTIVE SLOT */}
-      <div className="p-3 rounded-xl bg-white border border-nep-ink/10 flex flex-wrap items-center justify-between gap-3">
+      <div className="p-3.5 rounded-xl bg-white border border-nep-ink/10 flex flex-col gap-2.5">
         {activeSlot === "top" && (
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-bold text-nep-ink/70 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5 text-nep-red" />
-              <span>Dáng Áo:</span>
-            </span>
-            <div className="flex flex-wrap gap-1">
-              {[
-                { id: "all", label: "Tất cả" },
-                { id: "ao_ngu_than", label: "Áo Ngũ Thân" },
-                { id: "ao_tac", label: "Áo Tấc" },
-                { id: "ao_dai", label: "Áo Dài" },
-                { id: "ao_tu_than", label: "Áo Tứ Thân" },
-              ].map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => setTopGroupFilter(f.id)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
-                    topGroupFilter === f.id
-                      ? "bg-nep-red text-white"
-                      : "bg-surface-container-high hover:bg-surface-container text-nep-ink"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
+          <div className="flex flex-col gap-2.5 w-full">
+            {/* Hàng 1: Dáng áo */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-nep-ink/70 flex items-center gap-1 shrink-0 min-w-[70px]">
+                <Filter className="w-3.5 h-3.5 text-nep-red" />
+                <span>Dáng Áo:</span>
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { id: "all", label: "Tất cả" },
+                  { id: "ao_ngu_than", label: "Áo Ngũ Thân" },
+                  { id: "ao_tac", label: "Áo Tấc" },
+                  { id: "ao_dai", label: "Áo Dài" },
+                  { id: "ao_tu_than", label: "Áo Tứ Thân" },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setTopGroupFilter(f.id)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
+                      topGroupFilter === f.id
+                        ? "bg-nep-red text-white shadow-2xs"
+                        : "bg-surface-container-high hover:bg-surface-container text-nep-ink"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <span className="text-xs font-bold text-nep-ink/70 ml-2">Phái:</span>
-            <div className="flex gap-1">
-              {[
-                { id: "all", label: "Tất cả" },
-                { id: "nam", label: "Nam" },
-                { id: "nu", label: "Nữ" },
-              ].map((g) => (
-                <button
-                  key={g.id}
-                  type="button"
-                  onClick={() => setTopGenderFilter(g.id)}
-                  className={`px-2 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
-                    topGenderFilter === g.id
-                      ? "bg-nep-indigo text-white"
-                      : "bg-surface-container-high hover:bg-surface-container text-nep-ink"
-                  }`}
-                >
-                  {g.label}
-                </button>
-              ))}
+            {/* Hàng 2: Phái & Đếm số lượng */}
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-nep-ink/5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-nep-ink/70 min-w-[70px]">Phái:</span>
+                <div className="flex gap-1.5">
+                  {[
+                    { id: "all", label: "Tất cả" },
+                    { id: "nam", label: "Nam" },
+                    { id: "nu", label: "Nữ" },
+                  ].map((g) => (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() => setTopGenderFilter(g.id)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
+                        topGenderFilter === g.id
+                          ? "bg-nep-indigo text-white shadow-2xs"
+                          : "bg-surface-container-high hover:bg-surface-container text-nep-ink"
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <span className="text-[11px] font-mono text-nep-ink/50 ml-auto">
+                {displayedItems.length} mẫu trong album
+              </span>
             </div>
           </div>
         )}
 
         {activeSlot === "bottom" && (
-          <span className="text-xs text-nep-ink/70">
-            Quần lụa ống suông truyền thống cạp cao, phù hợp phối với mọi phom áo cổ truyền.
-          </span>
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+            <span className="text-xs text-nep-ink/70">
+              Quần lụa ống suông truyền thống cạp cao, phù hợp phối với mọi phom áo cổ truyền.
+            </span>
+            <span className="text-[11px] font-mono text-nep-ink/50">
+              {displayedItems.length} mẫu trong album
+            </span>
+          </div>
         )}
 
         {activeSlot === "footwear" && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-nep-ink/70">Phân loại:</span>
-            <div className="flex gap-1">
-              {[
-                { id: "all", label: "Tất cả" },
-                { id: "guoc", label: "Guốc Mộc Cổ Điển" },
-                { id: "sneaker", label: "Sneaker Hiện Đại" },
-              ].map((fw) => (
-                <button
-                  key={fw.id}
-                  type="button"
-                  onClick={() => setFootwearFilter(fw.id)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
-                    footwearFilter === fw.id
-                      ? "bg-nep-red text-white"
-                      : "bg-surface-container-high hover:bg-surface-container text-nep-ink"
-                  }`}
-                >
-                  {fw.label}
-                </button>
-              ))}
+          <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-nep-ink/70">Phân loại:</span>
+              <div className="flex gap-1.5">
+                {[
+                  { id: "all", label: "Tất cả" },
+                  { id: "guoc", label: "Guốc Mộc Cổ Điển" },
+                  { id: "sneaker", label: "Sneaker Hiện Đại" },
+                ].map((fw) => (
+                  <button
+                    key={fw.id}
+                    type="button"
+                    onClick={() => setFootwearFilter(fw.id)}
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
+                      footwearFilter === fw.id
+                        ? "bg-nep-red text-white shadow-2xs"
+                        : "bg-surface-container-high hover:bg-surface-container text-nep-ink"
+                    }`}
+                  >
+                    {fw.label}
+                  </button>
+                ))}
+              </div>
             </div>
+            <span className="text-[11px] font-mono text-nep-ink/50">
+              {displayedItems.length} mẫu trong album
+            </span>
           </div>
         )}
 
@@ -537,31 +571,30 @@ export default function FittingStudio({
                     </span>
                     {isShopee ? (
                       <span className="text-[9px] font-bold text-amber-900 bg-amber-100 px-1.5 py-0.2 rounded border border-amber-300">
-                        🛍️ Shopee
+                        Shopee
                       </span>
                     ) : (
                       <span className="text-[9px] font-medium text-nep-indigo bg-nep-indigo/10 px-1.5 py-0.2 rounded">
-                        🧵 May đo
+                        May đo
                       </span>
                     )}
                   </div>
 
-                  <h4 className="font-heading text-xs font-bold text-nep-ink line-clamp-2 leading-tight mb-1">
+                  <h4 className="font-heading text-xs font-bold text-nep-ink truncate mb-0.5" title={item.name_vi}>
                     {item.name_vi}
                   </h4>
 
                   {item.brand?.name && (
-                    <div className="flex items-center gap-1 text-[10px] text-nep-ink/60 truncate">
-                      <Store className="w-3 h-3 text-secondary shrink-0" />
-                      <span className="truncate">{item.brand.name}</span>
-                    </div>
+                    <span className="text-[10px] text-nep-ink/50 block truncate">
+                      {item.brand.name}
+                    </span>
                   )}
                 </div>
 
                 {/* Price Display */}
                 <div className="mt-2.5 pt-2 border-t border-nep-ink/5 flex items-center justify-between">
                   <span className="text-[10px] text-nep-ink/50 uppercase font-semibold">
-                    {isShopee ? "Mua Shopee" : "Giá tham khảo"}
+                    {isShopee ? "Mua Shopee" : "Ước tính"}
                   </span>
                   <span className="font-mono text-xs font-bold text-nep-red">
                     {item.pricing?.buy_price ? `${item.pricing.buy_price.toLocaleString()}₫` : "Xem chi tiết"}

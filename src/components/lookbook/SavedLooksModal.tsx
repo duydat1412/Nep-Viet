@@ -63,7 +63,7 @@ export default function SavedLooksModal({
               <Bookmark className="w-10 h-10 mx-auto mb-2 opacity-30 text-nep-red" />
               <p className="text-sm font-bold text-nep-ink">Chưa có bản phối nào được lưu</p>
               <p className="text-xs text-nep-ink/60 mt-1 max-w-xs mx-auto">
-                Khi tạo phối đồ ở Lookbook Atelier, bấm vào biểu tượng "Lưu Tủ Đồ" để lưu lại những bộ trang phục bạn yêu thích.
+                Khi tạo phối đồ ở Xưởng Ướm Thử hoặc AI Giám Tuyển, bấm vào nút "Lưu Tủ Đồ" để lưu lại những bộ trang phục bạn yêu thích.
               </p>
             </div>
           ) : (

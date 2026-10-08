@@ -494,7 +494,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-              <div className="lg:col-span-6">
+              <div className="lg:col-span-7">
                 <h1 className="font-heading text-4xl lg:text-5xl text-on-surface tracking-tight font-extrabold leading-tight">
                   Nếp Áo Thời Gian <span className="italic font-normal text-secondary font-heading text-3xl lg:text-4xl">— Giám Tuyển Cổ Phục</span>
                 </h1>
@@ -503,42 +503,21 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* 2 Phương Thức Tạo Lookbook: Ướm Thử Tự Do vs AI Giám Tuyển */}
-              <div className="lg:col-span-6 flex lg:justify-end">
-                <div className="inline-flex p-1.5 bg-surface-container-low rounded-2xl gap-1.5 shadow-sm border border-nep-ink/10 w-full sm:w-auto">
-                  <button 
-                    onClick={() => {
-                      setCreationMode("fitting");
-                      const el = document.getElementById("studio-workspace");
-                      el?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    type="button"
-                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      creationMode === "fitting" 
-                        ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container" 
-                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-                    }`}
-                  >
-                    <Scissors className="w-4 h-4 text-nep-gold" />
-                    <span>Ướm Thử Tự Do</span>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Live 0ms</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setCreationMode("wizard");
-                      const el = document.getElementById("studio-workspace");
-                      el?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                    type="button"
-                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      creationMode === "wizard" 
-                        ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container" 
-                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-                    }`}
-                  >
-                    <Sparkles className="w-4 h-4 text-nep-gold" />
-                    <span>AI Giám Tuyển</span>
-                  </button>
+              {/* Tóm tắt Công nghệ & Bảo chứng Di sản */}
+              <div className="lg:col-span-5 flex lg:justify-end">
+                <div className="flex flex-wrap sm:flex-nowrap lg:flex-wrap items-center gap-2 p-2.5 bg-surface-container-low rounded-2xl border border-nep-ink/10 text-xs">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 text-nep-ink font-medium shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
+                    <span>Quang học HSL</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 text-nep-ink font-medium shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-amber-600 inline-block"></span>
+                    <span>Quy tắc Văn hóa 100%</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/80 text-nep-indigo font-medium shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-nep-indigo inline-block"></span>
+                    <span>Trực quan Live 0ms</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -763,6 +742,13 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
+
+                {gender === "nu" && (
+                  <div className="mb-3.5 p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/80 text-[11px] text-amber-900 flex items-center gap-2 animate-scene-enter">
+                    <span className="text-secondary text-xs">✦</span>
+                    <span>Kho y phục Nữ đang được Nếp Việt liên tục bổ sung và đối chiếu thêm từ các xưởng may di sản.</span>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   {silhouettes.map((s) => {

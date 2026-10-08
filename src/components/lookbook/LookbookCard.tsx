@@ -109,7 +109,9 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
         {/* Header */}
         <div className="text-left mb-2 pr-12">
           <div className="flex items-center gap-1.5 mb-0.5">
-            <span className="text-[9px] font-mono font-bold tracking-widest uppercase text-nep-gold">LOOK NO. 01</span>
+            <span className="text-[9px] font-mono font-bold tracking-widest uppercase text-nep-gold">
+              LOOK NO. {result.combo_id ? (result.combo_id.match(/\d+$/)?.[0] || "01").padStart(2, "0") : "01"}
+            </span>
             <span className="text-[9px] text-nep-ink/30">•</span>
             <span className="text-[9px] text-nep-ink/60 uppercase">DI SẢN ĐƯƠNG ĐẠI</span>
           </div>

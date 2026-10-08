@@ -21,7 +21,8 @@ Quy tắc:
 1. Xác định đúng nhóm trang phục (group: ao_ngu_than, ao_dai, ao_tac, ao_tu_than, ao_nhat_binh, phu_kien) và vị trí mặc (slot: top, bottom, outer, footwear, bag, jewelry).
 2. Ước lượng mã màu HEX đại diện cho sản phẩm (ví dụ: xanh chàm #26466D, trắng ngà #F8F9FA, đỏ son #B5362B...).
 3. Bóc tách thông tin giá bán (buy_price) và giá thuê (rental_price) tính bằng VNĐ nếu có trong bài, hoặc ước tính khoảng giá hợp lý cho cổ phục Việt Nam.
-4. Viết đoạn lore văn hóa ngắn (1-2 câu) trang trọng, nêu bật giá trị di sản và kỹ thuật dệt may.`;
+4. Viết đoạn lore văn hóa ngắn (1-2 câu) trang trọng, nêu bật giá trị di sản và kỹ thuật dệt may.
+5. Luôn trả lời JSON hợp lệ, không chứa ký tự xuống dòng thô (raw line break) bên trong các chuỗi string.`;
 
 const INGEST_RESPONSE_SCHEMA = {
   type: "object",

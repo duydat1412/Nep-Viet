@@ -21,8 +21,11 @@ import {
   AlertCircle,
   RefreshCw,
   Eye,
-  Info
+  Info,
+  Scissors,
+  ShoppingBag
 } from "lucide-react";
+import SmartImageCropperModal, { CropCoords, SLOT_PRESETS } from "@/components/admin/SmartImageCropperModal";
 
 export default function AdminStudioPage() {
   const [activeTab, setActiveTab] = useState<"catalog" | "manual" | "ai">("catalog");
@@ -33,6 +36,7 @@ export default function AdminStudioPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterSlot, setFilterSlot] = useState("all");
   const [filterGroup, setFilterGroup] = useState("all");
+  const [filterChannel, setFilterChannel] = useState("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   // --- MANUAL / EDIT FORM STATES ---
@@ -50,6 +54,16 @@ export default function AdminStudioPage() {
   const [formColorName, setFormColorName] = useState("Xanh Chàm");
   const [formColorHex, setFormColorHex] = useState("#26466D");
   
+  // Channel & Origin
+  const [formChannel, setFormChannel] = useState<"may_do_thu_cong" | "san_tmdt_shopee" | "hang_san_co">("may_do_thu_cong");
+  const [formOriginUrl, setFormOriginUrl] = useState("");
+
+  // Smart Cropper Modal States
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropImageUrl, setCropImageUrl] = useState("");
+  const [cropSlot, setCropSlot] = useState("top");
+  const [cropTarget, setCropTarget] = useState<"form" | "ai">("form");
+
   // Brand & Pricing
   const [formBrandName, setFormBrandName] = useState("");
   const [formBrandLocation, setFormBrandLocation] = useState("");
@@ -207,6 +221,8 @@ export default function AdminStudioPage() {
     setFormMaterial("");
     setFormCraftLore("");
     setFormSources("N1");
+    setFormChannel("may_do_thu_cong");
+    setFormOriginUrl("");
     setFormSuccessMessage(null);
     setFormErrorMessage(null);
     setUploadNotice(null);
@@ -226,6 +242,8 @@ export default function AdminStudioPage() {
     setFormStyles(item.style_levels || []);
     setFormTags((item.tags || []).join(", "));
     setFormAsset(item.asset || item.image_url || "");
+    setFormChannel(item.channel || (item.brand?.url?.includes("shopee") ? "san_tmdt_shopee" : "may_do_thu_cong"));
+    setFormOriginUrl(item.origin_url || item.brand?.url || "");
     
     if (item.colors && item.colors[0]) {
       setFormColorName(item.colors[0].name || "Màu sắc");
@@ -239,7 +257,7 @@ export default function AdminStudioPage() {
 
     setFormBuyPrice(item.pricing?.buy_price !== undefined ? item.pricing.buy_price : "");
     setFormRentalPrice(item.pricing?.rental_price !== undefined ? item.pricing.rental_price : "");
-    setFormIsEstimate(item.pricing?.is_estimate !== undefined ? item.pricing.is_estimate : true);
+    setFormIsEstimate(item.pricing?.is_estimate !== undefined ? item.pricing.is_estimate : (item.channel !== "san_tmdt_shopee"));
     setFormRefRange(item.pricing?.reference_range || "");
     setFormPriceNote(item.pricing?.note || "");
 
@@ -301,7 +319,18 @@ export default function AdminStudioPage() {
         };
       }
 
-      if (formBuyPrice !== "" || formRentalPrice !== "" || formRefRange) {
+      payload.channel = formChannel;
+      if (formOriginUrl) payload.origin_url = formOriginUrl;
+
+      if (formChannel === "san_tmdt_shopee") {
+        payload.pricing = {
+          buy_price: formBuyPrice !== "" ? Number(formBuyPrice) : undefined,
+          currency: "VND",
+          is_estimate: false,
+          pricing_type: "may_san_tmdt",
+          note: formPriceNote.trim() || "Sản phẩm may sẵn mua trực tiếp từ sàn Shopee",
+        };
+      } else if (formBuyPrice !== "" || formRentalPrice !== "" || formRefRange) {
         payload.pricing = {
           buy_price: formBuyPrice !== "" ? Number(formBuyPrice) : undefined,
           rental_price: formRentalPrice !== "" ? Number(formRentalPrice) : undefined,
@@ -345,6 +374,20 @@ export default function AdminStudioPage() {
     }
   };
 
+  // Áp dụng ảnh sau khi cắt thông minh (Smart Crop)
+  const handleApplyCrop = (croppedUrl: string) => {
+    if (cropTarget === "form") {
+      setFormAsset(croppedUrl);
+      setUploadNotice("Đã cắt riêng trang phục và lưu ảnh thành công!");
+    } else if (cropTarget === "ai") {
+      setAiResult((prev: any) => ({
+        ...prev,
+        asset: croppedUrl,
+        image_url: croppedUrl,
+      }));
+    }
+  };
+
   // AI Ingestion Handler
   const handleAiIngest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -355,6 +398,9 @@ export default function AdminStudioPage() {
   const handleApplyAiResultToForm = () => {
     if (!aiResult) return;
     handleEditProduct(aiResult);
+    if (aiResult.channel) setFormChannel(aiResult.channel);
+    if (aiResult.origin_url) setFormOriginUrl(aiResult.origin_url);
+    if (aiResult.asset || aiResult.image_url) setFormAsset(aiResult.asset || aiResult.image_url);
     setActiveTab("manual");
   };
 
@@ -368,8 +414,14 @@ export default function AdminStudioPage() {
 
     const matchSlot = filterSlot === "all" || p.slot === filterSlot;
     const matchGroup = filterGroup === "all" || p.group === filterGroup;
+    const isShopee = p.channel === "san_tmdt_shopee" || Boolean(p.brand?.url?.includes("shopee"));
+    const matchChannel = 
+      filterChannel === "all" ||
+      (filterChannel === "san_tmdt_shopee" && isShopee) ||
+      (filterChannel === "may_do_thu_cong" && !isShopee && (p.channel || "may_do_thu_cong") === "may_do_thu_cong") ||
+      (filterChannel === "hang_san_co" && p.channel === "hang_san_co");
 
-    return matchSearch && matchSlot && matchGroup;
+    return matchSearch && matchSlot && matchGroup && matchChannel;
   });
 
   return (
@@ -483,6 +535,17 @@ export default function AdminStudioPage() {
                   <option value="phu_kien">Phụ Kiện</option>
                 </select>
 
+                <select
+                  value={filterChannel}
+                  onChange={(e) => setFilterChannel(e.target.value)}
+                  className="px-3 py-2 rounded-xl border border-nep-ink/15 text-xs bg-white focus:outline-none font-medium"
+                >
+                  <option value="all">Tất cả nguồn hàng</option>
+                  <option value="san_tmdt_shopee">🛍️ Sàn Shopee (May sẵn TMĐT)</option>
+                  <option value="may_do_thu_cong">🧵 Xưởng May Đo Thủ Công</option>
+                  <option value="hang_san_co">📦 Hàng Có Sẵn Kho</option>
+                </select>
+
                 <button
                   onClick={() => {
                     resetForm();
@@ -514,6 +577,7 @@ export default function AdminStudioPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filteredProducts.map((p) => {
                   const imgUrl = p.asset || p.image_url;
+                  const isShopeeItem = p.channel === "san_tmdt_shopee" || Boolean(p.brand?.url?.includes("shopee"));
                   return (
                     <div
                       key={p.id}
@@ -522,22 +586,31 @@ export default function AdminStudioPage() {
                       <div>
                         {/* Top Badges */}
                         <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-[10px] font-bold uppercase tracking-wider bg-nep-red/10 text-nep-red px-2 py-0.5 rounded-md font-mono">
                               {p.slot} · {p.group}
                             </span>
-                            <span className="text-[10px] font-semibold text-nep-indigo bg-nep-indigo/10 px-2 py-0.5 rounded-md">
+                            {isShopeeItem ? (
+                              <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md flex items-center gap-1 border border-amber-300">
+                                <span>🛍️ Shopee May Sẵn</span>
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-semibold text-nep-indigo bg-nep-indigo/10 px-2 py-0.5 rounded-md">
+                                🧵 May đo thủ công
+                              </span>
+                            )}
+                            <span className="text-[10px] font-semibold text-nep-ink/60 bg-nep-ink/5 px-2 py-0.5 rounded-md">
                               {p.gender === "nam" ? "Nam" : p.gender === "nu" ? "Nữ" : "Unisex"}
                             </span>
                           </div>
                           <span className="text-[9px] font-mono text-nep-ink/50" title={p.id}>
-                            #{p.id.slice(0, 14)}...
+                            #{p.id.slice(0, 12)}...
                           </span>
                         </div>
 
                         {/* Image Preview & Details */}
                         <div className="flex gap-3 mb-3">
-                          <div className="w-20 h-24 bg-nep-paper/50 rounded-xl border border-nep-ink/5 flex items-center justify-center p-1 shrink-0 overflow-hidden">
+                          <div className="w-20 h-24 bg-nep-paper/50 rounded-xl border border-nep-ink/5 flex items-center justify-center p-1 shrink-0 overflow-hidden relative group">
                             {imgUrl ? (
                               <img
                                 src={imgUrl}
@@ -571,7 +644,7 @@ export default function AdminStudioPage() {
                                   className="w-3 h-3 rounded-full border border-black/10"
                                   style={{ backgroundColor: p.colors[0].hex }}
                                 />
-                                <span className="text-[10px] text-nep-ink/60">
+                                <span className="text-[10px] text-nep-ink/60 truncate">
                                   {p.colors[0].name}
                                 </span>
                               </div>
@@ -581,31 +654,61 @@ export default function AdminStudioPage() {
 
                         {/* Pricing Transparency */}
                         <div className="p-2.5 rounded-xl bg-nep-paper/60 border border-nep-ink/5 text-xs mb-3 space-y-0.5">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] text-nep-ink/60">
-                              {p.pricing?.is_estimate ? "Giá tham khảo:" : "Giá niêm yết:"}
-                            </span>
-                            {p.pricing?.is_estimate && (
-                              <span className="text-[8px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-mono">
-                                Ước tính
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-baseline justify-between">
-                            {p.pricing?.buy_price ? (
-                              <span className="font-bold text-nep-red font-mono">
-                                {p.pricing?.is_estimate ? "~" : ""}{p.pricing.buy_price.toLocaleString()}₫
-                              </span>
-                            ) : (
-                              <span className="text-[10px] text-nep-ink/40">Liên hệ báo giá</span>
-                            )}
+                          {isShopeeItem ? (
+                            <div>
+                              <div className="flex items-center justify-between mb-0.5">
+                                <span className="text-[10px] font-semibold text-amber-900">
+                                  Giá mua Shopee (Hàng may sẵn):
+                                </span>
+                                <span className="text-[8px] bg-amber-200 text-amber-950 px-1.5 py-0.2 rounded font-bold">
+                                  Mua trực tiếp
+                                </span>
+                              </div>
+                              <div className="flex items-baseline justify-between">
+                                <span className="font-bold text-nep-red font-mono text-sm">
+                                  {p.pricing?.buy_price ? `${p.pricing.buy_price.toLocaleString()}₫` : "Xem trên Shopee"}
+                                </span>
+                                {p.brand?.url && (
+                                  <a
+                                    href={p.brand.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="text-[10px] text-amber-800 hover:text-amber-950 font-bold underline flex items-center gap-0.5"
+                                  >
+                                    <span>Shopee ↗</span>
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-nep-ink/60">
+                                  {p.pricing?.is_estimate ? "Giá tham khảo:" : "Giá niêm yết:"}
+                                </span>
+                                {p.pricing?.is_estimate && (
+                                  <span className="text-[8px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-mono">
+                                    Ước tính
+                                  </span>
+                                )}
+                              </div>
+                              <div className="flex items-baseline justify-between">
+                                {p.pricing?.buy_price ? (
+                                  <span className="font-bold text-nep-red font-mono">
+                                    {p.pricing?.is_estimate ? "~" : ""}{p.pricing.buy_price.toLocaleString()}₫
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-nep-ink/40">Liên hệ báo giá</span>
+                                )}
 
-                            {p.pricing?.rental_price ? (
-                              <span className="text-[10px] font-mono text-nep-indigo font-semibold">
-                                Thuê: ~{p.pricing.rental_price.toLocaleString()}₫
-                              </span>
-                            ) : null}
-                          </div>
+                                {p.pricing?.rental_price ? (
+                                  <span className="text-[10px] font-mono text-nep-indigo font-semibold">
+                                    Thuê: ~{p.pricing.rental_price.toLocaleString()}₫
+                                  </span>
+                                ) : null}
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -619,6 +722,22 @@ export default function AdminStudioPage() {
                           <Edit3 className="w-3 h-3" />
                           <span>Chỉnh Sửa</span>
                         </button>
+                        {imgUrl && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCropImageUrl(imgUrl);
+                              setCropSlot(p.slot || "top");
+                              setCropTarget("form");
+                              handleEditProduct(p);
+                              setCropModalOpen(true);
+                            }}
+                            className="p-1.5 rounded-lg text-amber-700 hover:bg-amber-50 border border-amber-300 transition-colors cursor-pointer"
+                            title="Cắt ảnh theo phân loại (Smart Crop)"
+                          >
+                            <Scissors className="w-3.5 h-3.5" />
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => handleDeleteProduct(p.id)}
@@ -732,9 +851,26 @@ export default function AdminStudioPage() {
                       </button>
 
                       {formAsset && (
-                        <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 font-mono">
-                          ✓ Đã gắn URL ảnh
-                        </span>
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCropImageUrl(formAsset);
+                              setCropSlot(formSlot);
+                              setCropTarget("form");
+                              setCropModalOpen(true);
+                            }}
+                            className="px-4 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                            title="Mở bộ cắt tọa độ thông minh để bóc tách riêng trang phục khỏi người mẫu"
+                          >
+                            <Scissors className="w-3.5 h-3.5 text-amber-700" />
+                            <span>✂️ Cắt Tọa Độ Thông Minh (Smart Crop)</span>
+                          </button>
+
+                          <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 font-mono">
+                            ✓ Đã gắn URL ảnh
+                          </span>
+                        </>
                       )}
                     </div>
 
@@ -905,115 +1041,266 @@ export default function AdminStudioPage() {
 
               {/* SECTION 4: THƯƠNG HIỆU & GIÁ CẢ MINH BẠCH */}
               <div className="p-5 rounded-2xl bg-white border border-nep-ink/10 space-y-4">
-                <h3 className="font-heading text-sm font-bold text-nep-ink flex items-center gap-2">
-                  <Store className="w-4 h-4 text-nep-red" />
-                  <span>2. Thông Tin Thương Hiệu &amp; Báo Giá Minh Bạch</span>
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                  <div className="md:col-span-4">
-                    <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
-                      Tên thương hiệu / Nghệ nhân / Xưởng may:
-                    </label>
-                    <input
-                      type="text"
-                      value={formBrandName}
-                      onChange={(e) => setFormBrandName(e.target.value)}
-                      placeholder="Ỷ Vân Hiên, Hợp tác xã Lụa Vạn Phúc..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
-                    />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-nep-ink/10">
+                  <div>
+                    <h3 className="font-heading text-sm font-bold text-nep-ink flex items-center gap-2">
+                      <Store className="w-4 h-4 text-nep-red" />
+                      <span>2. Nguồn Cung Ứng &amp; Báo Giá Minh Bạch</span>
+                    </h3>
+                    <p className="text-[11px] text-nep-ink/60 mt-0.5">
+                      Chọn đúng nguồn sản phẩm để áp dụng chính sách giá phù hợp (Shopee chỉ có giá mua trực tiếp, không có giá thuê hay may đo).
+                    </p>
                   </div>
 
-                  <div className="md:col-span-4">
-                    <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
-                      Địa chỉ / Tỉnh thành:
-                    </label>
-                    <input
-                      type="text"
-                      value={formBrandLocation}
-                      onChange={(e) => setFormBrandLocation(e.target.value)}
-                      placeholder="Hà Nội, Huế, TP.HCM..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
-                    />
-                  </div>
-
-                  <div className="md:col-span-4">
-                    <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
-                      Website / Fanpage liên hệ:
-                    </label>
-                    <input
-                      type="url"
-                      value={formBrandUrl}
-                      onChange={(e) => setFormBrandUrl(e.target.value)}
-                      placeholder="https://yvanhien.com..."
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
-                    />
-                  </div>
-
-                  <div className="md:col-span-3">
-                    <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
-                      Giá may đo / mua (VNĐ):
-                    </label>
-                    <input
-                      type="number"
-                      value={formBuyPrice}
-                      onChange={(e) => setFormBuyPrice(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="3500000"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white font-mono"
-                    />
-                  </div>
-
-                  <div className="md:col-span-3">
-                    <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
-                      Giá thuê / ngày (VNĐ):
-                    </label>
-                    <input
-                      type="number"
-                      value={formRentalPrice}
-                      onChange={(e) => setFormRentalPrice(e.target.value === "" ? "" : Number(e.target.value))}
-                      placeholder="350000"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white font-mono"
-                    />
-                  </div>
-
-                  <div className="md:col-span-3">
-                    <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
-                      Khoảng giá tham khảo hiển thị:
-                    </label>
-                    <input
-                      type="text"
-                      value={formRefRange}
-                      onChange={(e) => setFormRefRange(e.target.value)}
-                      placeholder="~3.0M – 4.2M ₫"
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white font-mono"
-                    />
-                  </div>
-
-                  <div className="md:col-span-3 flex items-center h-full pt-5">
-                    <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-nep-ink">
-                      <input
-                        type="checkbox"
-                        checked={formIsEstimate}
-                        onChange={(e) => setFormIsEstimate(e.target.checked)}
-                        className="w-4 h-4 accent-nep-red rounded"
-                      />
-                      <span>Đánh dấu là "Giá khảo sát ước tính"</span>
-                    </label>
-                  </div>
-
-                  <div className="md:col-span-12">
-                    <label className="block text-[11px] font-semibold text-nep-ink/60 mb-1">
-                      Ghi chú minh bạch về giá:
-                    </label>
-                    <input
-                      type="text"
-                      value={formPriceNote}
-                      onChange={(e) => setFormPriceNote(e.target.value)}
-                      placeholder="Mức giá tham khảo khảo sát từ các xưởng may thủ công. Giá thực tế phụ thuộc chất liệu gấm/lụa và may đo riêng."
-                      className="w-full px-3.5 py-2 rounded-xl border border-nep-ink/15 text-xs bg-white"
-                    />
+                  {/* Channel Switcher */}
+                  <div className="flex items-center gap-1 bg-nep-paper/80 p-1 rounded-xl border border-nep-ink/10 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormChannel("may_do_thu_cong");
+                        setFormIsEstimate(true);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        formChannel === "may_do_thu_cong"
+                          ? "bg-nep-red text-white shadow-xs"
+                          : "text-nep-ink/70 hover:text-nep-ink"
+                      }`}
+                    >
+                      🧵 May Đo Thủ Công
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormChannel("san_tmdt_shopee");
+                        setFormIsEstimate(false);
+                        setFormRentalPrice("");
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        formChannel === "san_tmdt_shopee"
+                          ? "bg-amber-600 text-white shadow-xs"
+                          : "text-nep-ink/70 hover:text-nep-ink"
+                      }`}
+                    >
+                      🛍️ Shopee May Sẵn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormChannel("hang_san_co");
+                        setFormIsEstimate(false);
+                      }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        formChannel === "hang_san_co"
+                          ? "bg-nep-indigo text-white shadow-xs"
+                          : "text-nep-ink/70 hover:text-nep-ink"
+                      }`}
+                    >
+                      📦 Hàng Sẵn Kho
+                    </button>
                   </div>
                 </div>
+
+                {/* Conditional Fields based on formChannel */}
+                {formChannel === "san_tmdt_shopee" ? (
+                  <div className="space-y-4">
+                    {/* Notice for Shopee items */}
+                    <div className="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5">
+                      <ShoppingBag className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <p className="font-bold">
+                          Phân loại Hàng Sàn TMĐT Shopee (Hàng May Sẵn)
+                        </p>
+                        <p className="text-[11px] text-amber-800/90 leading-relaxed">
+                          Sản phẩm này mua trực tiếp từ Shopee nên <strong>chỉ có giá mua niêm yết</strong>. Hệ thống tự động <strong>ẩn giá thuê và giá may đo</strong>. Khi phối đồ, người dùng nhấn vào sẽ chuyển thẳng đến link Shopee để đặt mua.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                      <div className="md:col-span-4">
+                        <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                          Tên Gian Hàng / Shop Shopee:
+                        </label>
+                        <input
+                          type="text"
+                          value={formBrandName}
+                          onChange={(e) => setFormBrandName(e.target.value)}
+                          placeholder="Mộc An Áo Dài, Hoa Niên Shopee Mall..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
+                        />
+                      </div>
+
+                      <div className="md:col-span-4">
+                        <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                          Khu vực gửi hàng / Kho Shopee:
+                        </label>
+                        <input
+                          type="text"
+                          value={formBrandLocation}
+                          onChange={(e) => setFormBrandLocation(e.target.value)}
+                          placeholder="Thành phố Hà Nội, TP. Hồ Chí Minh..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
+                        />
+                      </div>
+
+                      <div className="md:col-span-4">
+                        <label className="block text-xs font-semibold text-amber-900 font-bold mb-1">
+                          Đường dẫn sản phẩm Shopee (Link mua):
+                        </label>
+                        <input
+                          type="url"
+                          value={formBrandUrl || formOriginUrl}
+                          onChange={(e) => {
+                            setFormBrandUrl(e.target.value);
+                            setFormOriginUrl(e.target.value);
+                          }}
+                          placeholder="https://shopee.vn/Áo-dài-nam-..."
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-amber-300 text-xs bg-amber-50/30 focus:outline-none focus:ring-2 focus:ring-amber-400 font-mono"
+                        />
+                      </div>
+
+                      <div className="md:col-span-6">
+                        <label className="block text-xs font-bold text-nep-red mb-1">
+                          Giá mua niêm yết trên Shopee (VNĐ) (*):
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            required
+                            value={formBuyPrice}
+                            onChange={(e) => setFormBuyPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                            placeholder="400000"
+                            className="w-full px-3.5 py-2.5 rounded-xl border border-nep-red/30 text-sm bg-white font-mono font-bold text-nep-red"
+                          />
+                          <span className="absolute right-3.5 top-2.5 text-xs text-nep-ink/50 font-bold">
+                            VNĐ
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-nep-ink/50 mt-1">
+                          Giá bán cố định từ gian hàng Shopee. Không tính giá thuê hay phụ phí may đo.
+                        </p>
+                      </div>
+
+                      <div className="md:col-span-6">
+                        <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                          Ghi chú sản phẩm Shopee:
+                        </label>
+                        <input
+                          type="text"
+                          value={formPriceNote}
+                          onChange={(e) => setFormPriceNote(e.target.value)}
+                          placeholder="Hàng may sẵn từ Shopee, chất vải linen/lụa, giao toàn quốc"
+                          className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div className="md:col-span-4">
+                      <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                        Tên thương hiệu / Nghệ nhân / Xưởng may:
+                      </label>
+                      <input
+                        type="text"
+                        value={formBrandName}
+                        onChange={(e) => setFormBrandName(e.target.value)}
+                        placeholder="Ỷ Vân Hiên, Hợp tác xã Lụa Vạn Phúc..."
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
+                      />
+                    </div>
+
+                    <div className="md:col-span-4">
+                      <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                        Địa chỉ / Tỉnh thành:
+                      </label>
+                      <input
+                        type="text"
+                        value={formBrandLocation}
+                        onChange={(e) => setFormBrandLocation(e.target.value)}
+                        placeholder="Hà Nội, Huế, TP.HCM..."
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
+                      />
+                    </div>
+
+                    <div className="md:col-span-4">
+                      <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                        Website / Fanpage liên hệ:
+                      </label>
+                      <input
+                        type="url"
+                        value={formBrandUrl}
+                        onChange={(e) => setFormBrandUrl(e.target.value)}
+                        placeholder="https://yvanhien.com..."
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white"
+                      />
+                    </div>
+
+                    <div className="md:col-span-3">
+                      <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                        Giá may đo / mua (VNĐ):
+                      </label>
+                      <input
+                        type="number"
+                        value={formBuyPrice}
+                        onChange={(e) => setFormBuyPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                        placeholder="3500000"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white font-mono"
+                      />
+                    </div>
+
+                    <div className="md:col-span-3">
+                      <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                        Giá thuê / ngày (VNĐ):
+                      </label>
+                      <input
+                        type="number"
+                        value={formRentalPrice}
+                        onChange={(e) => setFormRentalPrice(e.target.value === "" ? "" : Number(e.target.value))}
+                        placeholder="350000"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white font-mono"
+                      />
+                    </div>
+
+                    <div className="md:col-span-3">
+                      <label className="block text-xs font-semibold text-nep-ink/80 mb-1">
+                        Khoảng giá tham khảo hiển thị:
+                      </label>
+                      <input
+                        type="text"
+                        value={formRefRange}
+                        onChange={(e) => setFormRefRange(e.target.value)}
+                        placeholder="~3.0M – 4.2M ₫"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white font-mono"
+                      />
+                    </div>
+
+                    <div className="md:col-span-3 flex items-center h-full pt-5">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold text-nep-ink">
+                        <input
+                          type="checkbox"
+                          checked={formIsEstimate}
+                          onChange={(e) => setFormIsEstimate(e.target.checked)}
+                          className="w-4 h-4 accent-nep-red rounded"
+                        />
+                        <span>Đánh dấu là "Giá khảo sát ước tính"</span>
+                      </label>
+                    </div>
+
+                    <div className="md:col-span-12">
+                      <label className="block text-[11px] font-semibold text-nep-ink/60 mb-1">
+                        Ghi chú minh bạch về giá:
+                      </label>
+                      <input
+                        type="text"
+                        value={formPriceNote}
+                        onChange={(e) => setFormPriceNote(e.target.value)}
+                        placeholder="Mức giá tham khảo khảo sát từ các xưởng may thủ công. Giá thực tế phụ thuộc chất liệu gấm/lụa và may đo riêng."
+                        className="w-full px-3.5 py-2 rounded-xl border border-nep-ink/15 text-xs bg-white"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* SECTION 5: CHẤT LIỆU, ĐIỂN TÍCH & NGUỒN */}
@@ -1223,14 +1510,59 @@ export default function AdminStudioPage() {
                     <span>Hồ sơ trích xuất được</span>
                   </h3>
                   {aiResult && (
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                      ✓ Đạt chuẩn Schema
-                    </span>
+                    <div className="flex items-center gap-2">
+                      {aiResult.channel === "san_tmdt_shopee" ? (
+                        <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
+                          🛍️ Shopee May Sẵn
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-nep-red bg-nep-red/10 px-2.5 py-0.5 rounded-full border border-nep-red/20">
+                          🧵 May Đo Thủ Công
+                        </span>
+                      )}
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        ✓ Schema OK
+                      </span>
+                    </div>
                   )}
                 </div>
 
                 {aiResult ? (
                   <div className="space-y-4">
+                    {/* Image and Smart Crop Action */}
+                    {(aiResult.asset || aiResult.image_url) && (
+                      <div className="flex flex-col sm:flex-row items-center gap-3 p-3 bg-white rounded-xl border border-nep-ink/10">
+                        <div className="w-20 h-20 shrink-0 flex items-center justify-center bg-nep-paper/50 rounded-lg overflow-hidden border border-nep-ink/5 p-1">
+                          <img
+                            src={aiResult.asset || aiResult.image_url}
+                            alt={aiResult.name_vi}
+                            className="max-h-full max-w-full object-contain drop-shadow-xs"
+                          />
+                        </div>
+                        <div className="flex-1 space-y-1.5 w-full">
+                          <span className="text-[10px] text-nep-ink/70 block font-medium">
+                            Hình ảnh trích xuất từ liên kết:
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setCropImageUrl(aiResult.asset || aiResult.image_url);
+                              setCropSlot(aiResult.slot || "top");
+                              setCropTarget("ai");
+                              setCropModalOpen(true);
+                            }}
+                            className="w-full py-2 px-3 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center justify-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+                            title="Tự động cắt theo tọa độ để chỉ lấy phần trang phục cần thiết, bỏ mặt người mẫu"
+                          >
+                            <Scissors className="w-3.5 h-3.5 text-amber-700" />
+                            <span>
+                              ✂️ Tự Động Cắt Lấy {aiResult.slot === "top" ? "Áo" : aiResult.slot === "bottom" ? "Quần" : aiResult.slot === "footwear" ? "Giày/Guốc" : "Trang Phục"} (Smart Crop)
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="p-3.5 rounded-xl bg-nep-paper/60 border border-nep-ink/5">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-nep-red font-mono">
@@ -1243,28 +1575,55 @@ export default function AdminStudioPage() {
                       <h4 className="font-heading text-base font-bold text-nep-ink">
                         {aiResult.name_vi}
                       </h4>
-                      <p className="text-xs text-nep-ink/70 mt-1 italic">
-                        "{aiResult.craftsmanship_lore}"
-                      </p>
+                      {aiResult.craftsmanship_lore && (
+                        <p className="text-xs text-nep-ink/70 mt-1 italic">
+                          "{aiResult.craftsmanship_lore}"
+                        </p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="p-3 rounded-xl bg-white border border-nep-ink/10">
                         <span className="text-[10px] text-nep-ink/50 uppercase font-semibold block mb-0.5">
-                          Thương hiệu
+                          Thương hiệu / Shop
                         </span>
-                        <span className="font-semibold text-xs text-nep-ink block">
+                        <span className="font-semibold text-xs text-nep-ink block truncate">
                           {aiResult.brand?.name || "Chưa rõ"}
                         </span>
+                        {aiResult.brand?.location && (
+                          <span className="text-[10px] text-nep-ink/60 block mt-0.5">
+                            {aiResult.brand.location}
+                          </span>
+                        )}
                       </div>
-                      <div className="p-3 rounded-xl bg-white border border-nep-ink/10">
-                        <span className="text-[10px] text-nep-ink/50 uppercase font-semibold block mb-0.5">
-                          Giá ước tính
-                        </span>
-                        <span className="font-bold text-nep-red text-xs block font-mono">
-                          {aiResult.pricing?.buy_price ? `${aiResult.pricing.buy_price.toLocaleString()}₫` : "Chưa rõ"}
-                        </span>
-                      </div>
+
+                      {aiResult.channel === "san_tmdt_shopee" ? (
+                        <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-200">
+                          <span className="text-[10px] text-amber-900 uppercase font-bold block mb-0.5">
+                            Giá mua Shopee (May sẵn)
+                          </span>
+                          <span className="font-bold text-nep-red text-sm block font-mono">
+                            {aiResult.pricing?.buy_price ? `${aiResult.pricing.buy_price.toLocaleString()}₫` : "Xem trên Shopee"}
+                          </span>
+                          <span className="text-[9px] text-amber-800/80 block mt-0.5">
+                            Không có giá thuê/may đo
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="p-3 rounded-xl bg-white border border-nep-ink/10">
+                          <span className="text-[10px] text-nep-ink/50 uppercase font-semibold block mb-0.5">
+                            Giá may đo / mua
+                          </span>
+                          <span className="font-bold text-nep-red text-sm block font-mono">
+                            {aiResult.pricing?.buy_price ? `${aiResult.pricing.buy_price.toLocaleString()}₫` : "Chưa rõ"}
+                          </span>
+                          {aiResult.pricing?.rental_price ? (
+                            <span className="text-[10px] text-nep-indigo block mt-0.5 font-mono">
+                              Thuê: ~{aiResult.pricing.rental_price.toLocaleString()}₫
+                            </span>
+                          ) : null}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -1303,6 +1662,15 @@ export default function AdminStudioPage() {
           </div>
         )}
       </div>
+
+      {/* SMART IMAGE CROPPER MODAL */}
+      <SmartImageCropperModal
+        isOpen={cropModalOpen}
+        imageUrl={cropImageUrl}
+        initialSlot={cropSlot}
+        onClose={() => setCropModalOpen(false)}
+        onApplyCrop={handleApplyCrop}
+      />
     </div>
   );
 }

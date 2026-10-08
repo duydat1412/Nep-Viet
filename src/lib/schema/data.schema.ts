@@ -21,6 +21,8 @@ export const BrandSchema = z.object({
   contact: z.string().optional()
 });
 
+export const ChannelEnum = z.enum(['may_do_thu_cong', 'san_tmdt_shopee', 'hang_san_co']);
+
 export const PricingSchema = z.object({
   buy_price: z.number().optional(),
   rental_price: z.number().optional(),
@@ -28,7 +30,15 @@ export const PricingSchema = z.object({
   is_estimate: z.boolean().optional(),
   reference_range: z.string().optional(),
   contact_for_quote: z.boolean().optional(),
-  note: z.string().optional()
+  note: z.string().optional(),
+  pricing_type: z.enum(['may_san_tmdt', 'may_do_rieng', 'thue_va_ban']).optional()
+});
+
+export const CropCoordsSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  width: z.number(),
+  height: z.number(),
 });
 
 export const ItemSchema = z.object({
@@ -48,7 +58,10 @@ export const ItemSchema = z.object({
   brand: BrandSchema.optional(),
   pricing: PricingSchema.optional(),
   material: z.string().optional(),
-  craftsmanship_lore: z.string().optional()
+  craftsmanship_lore: z.string().optional(),
+  channel: ChannelEnum.optional(),
+  origin_url: z.string().optional(),
+  crop_coords: CropCoordsSchema.optional(),
 });
 
 export const RuleSchema = z.object({

@@ -151,24 +151,49 @@ ${rawText || 'Hãy tạo một sản phẩm mẫu theo thông tin từ URL.'}`;
     // 3. Gọi Gemini trích xuất có cấu trúc
     const extractedItem = await callGemini(INGEST_SYSTEM_PROMPT, userPrompt, INGEST_RESPONSE_SCHEMA);
 
-    // Ghi đè giá và brand url từ Shopee nếu có
-    if (detectedPrice && detectedPrice > 0) {
+    const isFromShopee = url ? isShopeeUrl(url) : false;
+
+    // Ghi đè thông tin đặc thù cho sản phẩm sàn TMĐT Shopee (không có giá thuê/may đo)
+    if (isFromShopee) {
+      extractedItem.channel = 'san_tmdt_shopee';
+      extractedItem.origin_url = url;
+      extractedItem.pricing = {
+        buy_price: detectedPrice && detectedPrice > 0 ? detectedPrice : (extractedItem.pricing?.buy_price || 0),
+        currency: 'VND',
+        is_estimate: false,
+        pricing_type: 'may_san_tmdt',
+        note: 'Sản phẩm may sẵn bán trên sàn Shopee (mua trực tiếp, không hỗ trợ cho thuê hoặc may đo riêng)',
+      };
+    } else if (detectedPrice && detectedPrice > 0) {
       extractedItem.pricing = {
         ...extractedItem.pricing,
         buy_price: detectedPrice,
         currency: 'VND',
       };
     }
+
     if (url) {
       extractedItem.brand = {
         ...extractedItem.brand,
         url: url,
         location: detectedLocation || extractedItem.brand?.location || 'Việt Nam',
-        name: detectedBrand || extractedItem.brand?.name || 'Thương hiệu Cổ Phục',
+        name: detectedBrand || extractedItem.brand?.name || (isFromShopee ? 'Shop Cổ Phục Shopee' : 'Thương hiệu Cổ Phục'),
       };
     }
 
     const finalAsset = detectedImage || extractedItem.image_url || '/assets/items/ao_ngu_than_nam_xanh_01.png';
+
+    // Tọa độ cắt mặc định thông minh theo từng loại sản phẩm (slot)
+    const slotPresets: Record<string, { x: number; y: number; width: number; height: number }> = {
+      top: { x: 10, y: 15, width: 80, height: 55 },
+      outer: { x: 5, y: 15, width: 90, height: 65 },
+      bottom: { x: 15, y: 50, width: 70, height: 45 },
+      footwear: { x: 20, y: 75, width: 60, height: 25 },
+      headwear: { x: 25, y: 0, width: 50, height: 30 },
+      bag: { x: 20, y: 35, width: 60, height: 45 },
+      jewelry: { x: 25, y: 15, width: 50, height: 35 },
+    };
+    const defaultCoords = slotPresets[extractedItem.slot] || slotPresets.top;
 
     return NextResponse.json(
       {
@@ -177,6 +202,9 @@ ${rawText || 'Hãy tạo một sản phẩm mẫu theo thông tin từ URL.'}`;
           ...extractedItem,
           asset: finalAsset,
           image_url: finalAsset,
+          raw_image_url: detectedImage || finalAsset,
+          crop_coords: defaultCoords,
+          channel: isFromShopee ? 'san_tmdt_shopee' : (extractedItem.channel || 'may_do_thu_cong'),
           source_ids: ['N1'],
           status: 'draft',
         },

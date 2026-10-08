@@ -356,82 +356,93 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
                 </div>
               )}
 
-              {selectedItem.pricing && (
-                <div className="p-3 rounded-xl bg-nep-paper/60 border border-nep-ink/10 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <Tag className="w-3.5 h-3.5 text-nep-gold" />
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-nep-ink/70">
-                        {selectedItem.pricing.is_estimate ? "Khoảng giá tham khảo may đo" : "Mức giá niêm yết"}
-                      </span>
-                    </div>
-                    {selectedItem.pricing.is_estimate && (
-                      <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-mono font-bold">
-                        Khảo sát thị trường
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs pt-0.5">
-                    {selectedItem.pricing.buy_price ? (
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-[11px] text-nep-ink/60">May/Mua:</span>
-                        <span className="font-bold text-nep-red text-sm font-mono">
-                          {selectedItem.pricing.is_estimate ? "~" : ""}{selectedItem.pricing.buy_price.toLocaleString()}₫
+              {selectedItem.pricing && (() => {
+                const isShopee = selectedItem.channel === "san_tmdt_shopee" || Boolean(selectedItem.brand?.url?.includes("shopee"));
+                return (
+                  <div className="p-3 rounded-xl bg-nep-paper/60 border border-nep-ink/10 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Tag className="w-3.5 h-3.5 text-nep-gold" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-nep-ink/70">
+                          {isShopee ? "Mức giá niêm yết trên Shopee" : (selectedItem.pricing.is_estimate ? "Khoảng giá tham khảo may đo" : "Mức giá niêm yết")}
                         </span>
                       </div>
-                    ) : null}
+                      {isShopee ? (
+                        <span className="text-[9px] bg-amber-200 text-amber-950 px-1.5 py-0.5 rounded font-mono font-bold">
+                          🛍️ Shopee May Sẵn
+                        </span>
+                      ) : selectedItem.pricing.is_estimate ? (
+                        <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-mono font-bold">
+                          Khảo sát thị trường
+                        </span>
+                      ) : null}
+                    </div>
 
-                    {selectedItem.pricing.reference_range && (
-                      <span className="text-[11px] text-nep-ink/60 font-mono">
-                        (Phổ thông: {selectedItem.pricing.reference_range})
-                      </span>
+                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs pt-0.5">
+                      {selectedItem.pricing.buy_price ? (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-[11px] text-nep-ink/60">{isShopee ? "Giá mua:" : "May/Mua:"}</span>
+                          <span className="font-bold text-nep-red text-sm font-mono">
+                            {!isShopee && selectedItem.pricing.is_estimate ? "~" : ""}{selectedItem.pricing.buy_price.toLocaleString()}₫
+                          </span>
+                        </div>
+                      ) : null}
+
+                      {!isShopee && selectedItem.pricing.reference_range && (
+                        <span className="text-[11px] text-nep-ink/60 font-mono">
+                          (Phổ thông: {selectedItem.pricing.reference_range})
+                        </span>
+                      )}
+
+                      {!isShopee && selectedItem.pricing.rental_price ? (
+                        <div className="flex items-baseline gap-1 border-l border-nep-ink/10 pl-2">
+                          <span className="text-[11px] text-nep-ink/60">Thuê:</span>
+                          <span className="font-bold text-nep-indigo font-mono">
+                            ~{selectedItem.pricing.rental_price.toLocaleString()}₫/ngày
+                          </span>
+                        </div>
+                      ) : null}
+                    </div>
+
+                    {selectedItem.pricing.note && (
+                      <p className="text-[10px] text-nep-ink/60 leading-relaxed italic pt-1 border-t border-nep-ink/5">
+                        *{selectedItem.pricing.note}
+                      </p>
                     )}
 
-                    {selectedItem.pricing.rental_price ? (
-                      <div className="flex items-baseline gap-1 border-l border-nep-ink/10 pl-2">
-                        <span className="text-[11px] text-nep-ink/60">Thuê:</span>
-                        <span className="font-bold text-nep-indigo font-mono">
-                          ~{selectedItem.pricing.rental_price.toLocaleString()}₫/ngày
-                        </span>
+                    {/* Nút liên hệ nhà may trực tiếp hoặc Mua trên Shopee */}
+                    {(selectedItem.brand?.url || selectedItem.brand?.contact) && (
+                      <div className="pt-2 flex items-center gap-2">
+                        {selectedItem.brand.url && (
+                          <a
+                            href={selectedItem.brand.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`flex-1 py-1.5 px-3 rounded-lg font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors ${
+                              isShopee
+                                ? "bg-amber-600 hover:bg-amber-700 text-white shadow-2xs"
+                                : "bg-nep-red/10 hover:bg-nep-red/15 text-nep-red"
+                            }`}
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            <span>{isShopee ? "Đặt mua ngay trên Shopee" : "Liên hệ nhà may để nhận báo giá"}</span>
+                          </a>
+                        )}
+                        {selectedItem.brand.contact && (
+                          <a
+                            href={`tel:${selectedItem.brand.contact.replace(/\s+/g, '')}`}
+                            className="py-1.5 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container text-nep-ink font-semibold text-[11px] flex items-center gap-1 transition-colors"
+                            title={`Hotline: ${selectedItem.brand.contact}`}
+                          >
+                            <Phone className="w-3 h-3 text-secondary" />
+                            <span className="font-mono text-[10px]">{selectedItem.brand.contact}</span>
+                          </a>
+                        )}
                       </div>
-                    ) : null}
+                    )}
                   </div>
-
-                  {selectedItem.pricing.note && (
-                    <p className="text-[10px] text-nep-ink/60 leading-relaxed italic pt-1 border-t border-nep-ink/5">
-                      *{selectedItem.pricing.note}
-                    </p>
-                  )}
-
-                  {/* Nút liên hệ nhà may trực tiếp */}
-                  {(selectedItem.brand?.url || selectedItem.brand?.contact) && (
-                    <div className="pt-2 flex items-center gap-2">
-                      {selectedItem.brand.url && (
-                        <a
-                          href={selectedItem.brand.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex-1 py-1.5 px-3 rounded-lg bg-nep-red/10 hover:bg-nep-red/15 text-nep-red font-bold text-[11px] flex items-center justify-center gap-1.5 transition-colors"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          <span>Liên hệ nhà may để nhận báo giá</span>
-                        </a>
-                      )}
-                      {selectedItem.brand.contact && (
-                        <a
-                          href={`tel:${selectedItem.brand.contact.replace(/\s+/g, '')}`}
-                          className="py-1.5 px-2.5 rounded-lg bg-surface-container-high hover:bg-surface-container text-nep-ink font-semibold text-[11px] flex items-center gap-1 transition-colors"
-                          title={`Hotline: ${selectedItem.brand.contact}`}
-                        >
-                          <Phone className="w-3 h-3 text-secondary" />
-                          <span className="font-mono text-[10px]">{selectedItem.brand.contact}</span>
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+                );
+              })()}
 
               {selectedItem.material && (
                 <p className="text-[11px] text-nep-ink/80">

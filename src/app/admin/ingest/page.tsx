@@ -23,9 +23,11 @@ import {
   Eye,
   Info,
   Scissors,
-  ShoppingBag
+  ShoppingBag,
+  Cpu
 } from "lucide-react";
 import SmartImageCropperModal, { CropCoords, SLOT_PRESETS } from "@/components/admin/SmartImageCropperModal";
+import { AVAILABLE_GEMINI_MODELS } from "@/lib/constants/models";
 
 export default function AdminStudioPage() {
   const [activeTab, setActiveTab] = useState<"catalog" | "manual" | "ai">("catalog");
@@ -95,12 +97,13 @@ export default function AdminStudioPage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResult, setAiResult] = useState<any>(null);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [selectedAiModel, setSelectedAiModel] = useState("gemini-3.6-flash");
   const [copiedJSON, setCopiedJSON] = useState(false);
   const [copiedBookmarklet, setCopiedBookmarklet] = useState(false);
   const [appOrigin, setAppOrigin] = useState("http://localhost:3000");
 
   // Function to execute Ingestion (called directly or from Bookmarklet)
-  const executeIngest = async (targetUrl: string, targetContent: string, targetImg?: string) => {
+  const executeIngest = async (targetUrl: string, targetContent: string, targetImg?: string, targetModel?: string) => {
     setAiLoading(true);
     setAiError(null);
     setAiResult(null);
@@ -113,6 +116,7 @@ export default function AdminStudioPage() {
           url: targetUrl,
           content: targetContent,
           image_url: targetImg,
+          model: targetModel || selectedAiModel,
         }),
       });
 
@@ -391,7 +395,7 @@ export default function AdminStudioPage() {
   // AI Ingestion Handler
   const handleAiIngest = async (e: React.FormEvent) => {
     e.preventDefault();
-    await executeIngest(aiUrl, aiContent);
+    await executeIngest(aiUrl, aiContent, undefined, selectedAiModel);
   };
 
   // Transfer AI Result to Manual Edit Form
@@ -1448,6 +1452,37 @@ export default function AdminStudioPage() {
                 </div>
               </div>
 
+              {/* GEMINI MODEL SELECTOR WITH AUTO-FALLBACK */}
+              <div className="mb-4 p-3.5 rounded-2xl bg-white border border-nep-ink/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-nep-ink flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-nep-indigo" />
+                    <span>Mô Hình Gemini AI (Chọn Model &amp; Auto-Fallback):</span>
+                  </label>
+                  <span className="text-[10px] bg-emerald-50 text-emerald-800 font-bold px-2 py-0.5 rounded-full border border-emerald-200">
+                    🛡️ Tự Động Chống Lỗi 429
+                  </span>
+                </div>
+
+                <div className="relative">
+                  <select
+                    value={selectedAiModel}
+                    onChange={(e) => setSelectedAiModel(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-nep-ink/20 text-xs bg-nep-paper/40 font-semibold text-nep-ink focus:outline-none focus:ring-2 focus:ring-nep-red/20 cursor-pointer"
+                  >
+                    {AVAILABLE_GEMINI_MODELS.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name} — [{m.badge}]
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <p className="text-[10px] text-nep-ink/60 leading-relaxed italic">
+                  💡 <strong>Cơ chế Auto-Fallback:</strong> Nếu model bạn chọn bị hết hạn mức (lỗi 429) hoặc tạm thời bận, hệ thống sẽ <strong>tự động chuyển sang model dự phòng tiếp theo</strong> để tiếp tục bóc tách dữ liệu mà không báo lỗi.
+                </p>
+              </div>
+
               <form onSubmit={handleAiIngest} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-nep-ink mb-1">
@@ -1483,12 +1518,12 @@ export default function AdminStudioPage() {
                   {aiLoading ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>Gemini đang đọc hiểu & trích xuất...</span>
+                      <span>Gemini đang đọc hiểu &amp; trích xuất...</span>
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4 text-nep-gold" />
-                      <span>Bóc Tách Bằng Gemini AI</span>
+                      <span>Bóc Tách Bằng Gemini AI ({selectedAiModel})</span>
                     </>
                   )}
                 </button>
@@ -1504,13 +1539,13 @@ export default function AdminStudioPage() {
             {/* AI Preview Result */}
             <div className="lg:col-span-6 bg-white/80 backdrop-blur-sm p-6 rounded-3xl border border-nep-ink/10 shadow-sm min-h-[420px] flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-4 pb-2 border-b border-nep-ink/10">
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-nep-ink/10 flex-wrap gap-2">
                   <h3 className="font-heading text-base font-bold text-nep-ink flex items-center gap-2">
                     <Store className="w-4 h-4 text-nep-indigo" />
                     <span>Hồ sơ trích xuất được</span>
                   </h3>
                   {aiResult && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
                       {aiResult.channel === "san_tmdt_shopee" ? (
                         <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2.5 py-0.5 rounded-full border border-amber-300">
                           🛍️ Shopee May Sẵn
@@ -1520,12 +1555,29 @@ export default function AdminStudioPage() {
                           🧵 May Đo Thủ Công
                         </span>
                       )}
+                      <span className="text-[10px] font-mono font-bold text-nep-indigo bg-nep-indigo/10 px-2 py-0.5 rounded-full border border-nep-indigo/20">
+                        🤖 {aiResult.used_model || selectedAiModel}
+                      </span>
+                      {aiResult.is_fallback && (
+                        <span className="text-[10px] font-bold text-amber-900 bg-amber-200/80 px-2 py-0.5 rounded-full border border-amber-300 animate-pulse">
+                          ⚡ Auto-Fallback
+                        </span>
+                      )}
                       <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                         ✓ Schema OK
                       </span>
                     </div>
                   )}
                 </div>
+
+                {aiResult && aiResult.is_fallback && (
+                  <div className="mb-3 p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>
+                      Model ban đầu hết quota (lỗi 429). Hệ thống đã <strong>tự động chuyển đổi thành công sang {aiResult.used_model}</strong>!
+                    </span>
+                  </div>
+                )}
 
                 {aiResult ? (
                   <div className="space-y-4">

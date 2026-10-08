@@ -81,7 +81,7 @@ const INGEST_RESPONSE_SCHEMA = {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { url, content, image_url, source } = body;
+    const { url, content, image_url, source, model } = body;
 
     if (!url && !content) {
       return NextResponse.json(
@@ -148,8 +148,8 @@ ${shopeeData.description.slice(0, 3000)}`;
 - Nội dung mô tả / bài đăng:
 ${rawText || 'Hãy tạo một sản phẩm mẫu theo thông tin từ URL.'}`;
 
-    // 3. Gọi Gemini trích xuất có cấu trúc
-    const extractedItem = await callGemini(INGEST_SYSTEM_PROMPT, userPrompt, INGEST_RESPONSE_SCHEMA);
+    // 3. Gọi Gemini trích xuất có cấu trúc (có hỗ trợ chỉ định model và tự động fallback nếu hết quota)
+    const extractedItem = await callGemini(INGEST_SYSTEM_PROMPT, userPrompt, INGEST_RESPONSE_SCHEMA, model);
 
     const isFromShopee = url ? isShopeeUrl(url) : false;
 
@@ -195,9 +195,14 @@ ${rawText || 'Hãy tạo một sản phẩm mẫu theo thông tin từ URL.'}`;
     };
     const defaultCoords = slotPresets[extractedItem.slot] || slotPresets.top;
 
+    const usedModel = extractedItem._used_model || model || 'gemini-3.6-flash';
+    const isFallback = Boolean(extractedItem._is_fallback);
+
     return NextResponse.json(
       {
         success: true,
+        used_model: usedModel,
+        is_fallback: isFallback,
         extracted_item: {
           ...extractedItem,
           asset: finalAsset,
@@ -207,6 +212,8 @@ ${rawText || 'Hãy tạo một sản phẩm mẫu theo thông tin từ URL.'}`;
           channel: isFromShopee ? 'san_tmdt_shopee' : (extractedItem.channel || 'may_do_thu_cong'),
           source_ids: ['N1'],
           status: 'draft',
+          used_model: usedModel,
+          is_fallback: isFallback,
         },
       },
       { headers: corsHeaders }

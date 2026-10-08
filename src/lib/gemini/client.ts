@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai';
+import { FALLBACK_MODEL_CHAIN } from '../constants/models';
 
 /**
  * Trình phân tích cú pháp JSON an toàn, tự động sửa lỗi xuống dòng chưa escape
@@ -126,7 +127,8 @@ export function safeParseJson(raw: string): any {
 export async function callGemini(
   systemPrompt: string,
   userPrompt: string,
-  responseSchema: object
+  responseSchema: object,
+  preferredModel?: string
 ) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
@@ -134,11 +136,25 @@ export async function callGemini(
   }
 
   const ai = new GoogleGenAI({ apiKey });
-  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
-  const fallbackModel = process.env.GEMINI_MODEL_FALLBACK || 'gemini-3.7-flash';
-  const timeoutMs = parseInt(process.env.GEMINI_TIMEOUT_MS || '20000', 10);
+  const configuredDefault = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+  const initialModel = preferredModel || configuredDefault;
 
-  const attempt = async (currentModel: string, temperature: number) => {
+  // Build model cascade list starting with initialModel, then fallback candidates
+  const modelsToTry: string[] = [initialModel];
+  for (const m of FALLBACK_MODEL_CHAIN) {
+    if (!modelsToTry.includes(m)) {
+      modelsToTry.push(m);
+    }
+  }
+
+  const timeoutMs = parseInt(process.env.GEMINI_TIMEOUT_MS || '20000', 10);
+  let lastError: any = null;
+
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const currentModel = modelsToTry[i];
+    const isFallback = i > 0;
+    const temperature = isFallback ? 0.0 : 0.2;
+
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -155,29 +171,37 @@ export async function callGemini(
         },
       });
       clearTimeout(id);
-      
+
       const text = response.text;
-      if (!text) throw new Error('Empty response from Gemini');
-      
-      return safeParseJson(text);
+      if (!text) throw new Error(`Phản hồi trống từ model ${currentModel}`);
+
+      const parsed = safeParseJson(text);
+      if (parsed && typeof parsed === 'object') {
+        parsed._used_model = currentModel;
+        parsed._is_fallback = isFallback;
+      }
+
+      if (isFallback) {
+        console.warn(`[Gemini Auto-Fallback] Đã tự động chuyển đổi thành công sang model: ${currentModel} (Model ban đầu ${initialModel} gặp sự cố hoặc hết quota)`);
+      }
+
+      return parsed;
     } catch (error: any) {
       clearTimeout(id);
-      throw error;
-    }
-  };
+      lastError = error;
 
-  try {
-    return await attempt(model, 0.2);
-  } catch (error: any) {
-    const isTimeout = error.name === 'AbortError';
-    const isRateLimit = error?.status === 429 || error?.status === 503;
-    const isModelUnavailable = error?.status === 404 || error?.status === 400;
-    const isParseError = error instanceof SyntaxError || error.message?.includes('JSON');
-    
-    if (isTimeout || isRateLimit || isModelUnavailable || isParseError) {
-      console.warn(`Gemini call failed with ${error.name || error.status || error.message}. Retrying with fallback model ${fallbackModel}...`);
-      return await attempt(fallbackModel, 0.0);
+      console.warn(
+        `[Gemini Warning] Model '${currentModel}' thất bại (status: ${error?.status || error?.name || 'unknown'}, message: ${error?.message?.slice(0, 100)}...). ` +
+        (i < modelsToTry.length - 1 ? `Đang tự động chuyển sang model dự phòng: '${modelsToTry[i + 1]}'...` : 'Đã thử hết danh sách model dự phòng.')
+      );
+
+      // Nếu còn model trong cascade list, tiếp tục thử model tiếp theo
+      if (i < modelsToTry.length - 1) {
+        continue;
+      }
     }
-    throw error;
   }
+
+  throw lastError || new Error('Tất cả các model Gemini đều không khả dụng hoặc đã hết quota');
 }
+

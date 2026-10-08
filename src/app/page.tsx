@@ -1010,26 +1010,6 @@ export default function Home() {
                   />
                 </div>
               )}
-
-              {/* Làng Nghề Giám Định Micro-Card */}
-              <div className="bg-surface-container-lowest p-4 rounded-2xl shadow-sm border border-nep-ink/5 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-secondary">
-                    <Store className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-secondary uppercase font-bold tracking-wider font-mono">Làng Nghề Giám Định</span>
-                    <h4 className="font-heading text-sm font-bold text-on-surface">Hợp Tác Xã Dệt Lụa Vạn Phúc</h4>
-                    <p className="text-[11px] text-on-surface-variant">Hà Đông, Hà Nội · Tương truyền canh cửi từ năm 865 (TK IX)</p>
-                  </div>
-                </div>
-                <a
-                  href="/admin/ingest"
-                  className="px-3 py-1 rounded-full bg-surface-container-high hover:bg-surface-container text-on-surface text-[10px] font-bold uppercase font-mono"
-                >
-                  Xem Hồ Sơ
-                </a>
-              </div>
             </aside>
           </div>
 

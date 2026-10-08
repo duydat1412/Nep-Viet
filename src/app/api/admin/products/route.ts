@@ -68,10 +68,14 @@ export async function POST(request: Request) {
     const items = getItems();
     const existingIndex = items.findIndex((i) => i.id === validation.data.id);
     if (existingIndex >= 0) {
-      return NextResponse.json(
-        { error: `Mã sản phẩm (ID) '${validation.data.id}' đã tồn tại trong danh mục.` },
-        { status: 409 }
-      );
+      // Nếu đã tồn tại ID này, cập nhật đè lên (upsert)
+      items[existingIndex] = validation.data;
+      saveItems(items);
+      return NextResponse.json({
+        success: true,
+        message: `Đã cập nhật sản phẩm '${validation.data.name_vi}' trong hệ sinh thái Nếp Việt.`,
+        item: validation.data,
+      });
     }
 
     items.unshift(validation.data);
@@ -90,7 +94,7 @@ export async function POST(request: Request) {
   }
 }
 
-// PUT /api/admin/products - Chỉnh sửa cập nhật sản phẩm
+// PUT /api/admin/products - Chỉnh sửa cập nhật sản phẩm (hỗ trợ Upsert nếu chưa có)
 export async function PUT(request: Request) {
   try {
     const body = await request.json();
@@ -108,10 +112,14 @@ export async function PUT(request: Request) {
     const items = getItems();
     const index = items.findIndex((i) => i.id === validation.data.id);
     if (index === -1) {
-      return NextResponse.json(
-        { error: `Không tìm thấy sản phẩm với ID: '${validation.data.id}'.` },
-        { status: 404 }
-      );
+      // Upsert: nếu chưa tồn tại ID này trong kho, tự động thêm mới vào danh mục
+      items.unshift(validation.data);
+      saveItems(items);
+      return NextResponse.json({
+        success: true,
+        message: `Đã thêm mới sản phẩm '${validation.data.name_vi}' vào kho Nếp Việt.`,
+        item: validation.data,
+      });
     }
 
     items[index] = validation.data;

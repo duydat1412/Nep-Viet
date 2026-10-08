@@ -233,9 +233,9 @@ export default function AdminStudioPage() {
     setUploadWarning(null);
   };
 
-  // Populate form with existing product for editing
-  const handleEditProduct = (item: any) => {
-    setIsEditing(true);
+  // Populate form with existing product for editing or new draft from AI
+  const handleEditProduct = (item: any, isExisting = true) => {
+    setIsEditing(isExisting);
     setFormId(item.id || "");
     setFormNameVi(item.name_vi || "");
     setFormSlot(item.slot || "top");
@@ -401,7 +401,8 @@ export default function AdminStudioPage() {
   // Transfer AI Result to Manual Edit Form
   const handleApplyAiResultToForm = () => {
     if (!aiResult) return;
-    handleEditProduct(aiResult);
+    const exists = products.some((p) => p.id === aiResult.id);
+    handleEditProduct(aiResult, exists);
     if (aiResult.channel) setFormChannel(aiResult.channel);
     if (aiResult.origin_url) setFormOriginUrl(aiResult.origin_url);
     if (aiResult.asset || aiResult.image_url) setFormAsset(aiResult.asset || aiResult.image_url);
@@ -923,16 +924,19 @@ export default function AdminStudioPage() {
 
                 <div className="md:col-span-6">
                   <label className="block text-xs font-bold text-nep-ink mb-1">
-                    Mã định danh (ID Hệ thống):
+                    Mã định danh (ID Hệ thống / SKU):
                   </label>
                   <input
                     type="text"
                     value={formId}
                     onChange={(e) => setFormId(e.target.value)}
                     disabled={isEditing}
-                    placeholder="Để trống hệ thống sẽ tự sinh ID theo tên"
+                    placeholder="Ví dụ: ao_ngu_than_01 (Để trống hệ thống sẽ tự sinh ID)"
                     className="w-full px-3.5 py-2.5 rounded-xl border border-nep-ink/15 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-nep-red/20 font-mono disabled:bg-nep-ink/5"
                   />
+                  <p className="text-[10px] text-nep-ink/50 mt-1">
+                    Mã duy nhất (SKU) để phân biệt món đồ này với các áo ngũ thân khác trong kho. Bạn có thể tự đặt tùy ý hoặc để trống.
+                  </p>
                 </div>
 
                 <div className="md:col-span-4">

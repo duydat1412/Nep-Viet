@@ -4,9 +4,12 @@ import { Combo } from './combo';
 export interface TriggeredRule {
   id: string;
   level: string;
+  title?: string;
   message_vi: string;
   source_ids: string[];
   confidence: string;
+  affected_item_ids?: string[];
+  affected_slots?: string[];
 }
 
 export function evaluateRules(combo: Combo, occasion: string, styleLevel: string) {
@@ -64,12 +67,24 @@ export function evaluateRules(combo: Combo, occasion: string, styleLevel: string
     if (when.formality_gap_gte !== undefined && gap < when.formality_gap_gte) match = false;
 
     if (match) {
+      const affectedItems = combo.items.filter((item) => {
+        if (when.item_tags_any && item.tags?.some((t: string) => when.item_tags_any.includes(t))) return true;
+        if (when.item_tags_all && when.item_tags_all.every((t: string) => item.tags?.includes(t))) return true;
+        if (when.bottom_tags_any && item.slot === 'bottom' && item.tags?.some((t: string) => when.bottom_tags_any.includes(t))) return true;
+        if (when.group_any && when.group_any.includes(item.group)) return true;
+        if (rule.id === 'R_DILE_03' && (item.tags?.includes('phu_kien_duong_pho') || item.id?.includes('sneaker') || item.id?.includes('tote'))) return true;
+        return false;
+      });
+
       triggered_rules.push({
         id: rule.id,
         level: rule.level || 'XANH',
+        title: (rule as any).title || 'Lưu ý quy tắc văn hóa',
         message_vi: rule.message_vi,
         source_ids: rule.source_ids || [],
-        confidence: rule.confidence || 'high'
+        confidence: rule.confidence || 'high',
+        affected_item_ids: affectedItems.map((i) => i.id),
+        affected_slots: Array.from(new Set(affectedItems.map((i) => i.slot)))
       });
 
       if (rule.action === 'exclude' && rule.level === 'DO') excluded = true;

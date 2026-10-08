@@ -178,7 +178,10 @@ export async function POST(request: Request) {
           triggered_rules: matchedEngineCombo.rules_result.triggered_rules.map((r: any) => ({
             id: r.id,
             level: r.level,
-            message_vi: r.message_vi
+            title: r.title,
+            message_vi: r.message_vi,
+            affected_item_ids: r.affected_item_ids,
+            affected_slots: r.affected_slots
           })),
           kb_cards: engineResult.kb_cards || [],
           items: comboItems
@@ -213,7 +216,10 @@ export async function POST(request: Request) {
             ? topEngineCombo.rules_result.triggered_rules.map((r: any) => ({
                 id: r.id,
                 level: r.level,
-                message_vi: r.message_vi
+                title: r.title,
+                message_vi: r.message_vi,
+                affected_item_ids: r.affected_item_ids,
+                affected_slots: r.affected_slots
               }))
             : [],
           kb_cards: engineResult.kb_cards || [],
@@ -239,7 +245,10 @@ export async function POST(request: Request) {
           triggered_rules: topEngineCombo.rules_result.triggered_rules.map((r: any) => ({
             id: r.id,
             level: r.level,
-            message_vi: r.message_vi
+            title: r.title,
+            message_vi: r.message_vi,
+            affected_item_ids: r.affected_item_ids,
+            affected_slots: r.affected_slots
           })),
           kb_cards: engineResult.kb_cards || [],
           items: comboItems

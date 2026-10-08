@@ -18,6 +18,7 @@ import {
   SlidersHorizontal
 } from "lucide-react";
 import { TriggeredRule } from "@/lib/engine/rules";
+import { detectOffendingItems } from "@/lib/engine/rule-detector";
 
 function getVietnameseBadge(group?: string, slot?: string): string {
   const groupMap: Record<string, string> = {
@@ -88,11 +89,32 @@ export default function FittingStudio({
 }: FittingStudioProps) {
   // Active part tab: "top" | "bottom" | "footwear" | "accessory"
   const [activeSlot, setActiveSlot] = useState<"top" | "bottom" | "footwear" | "accessory">("top");
+  const [isWarningFocused, setIsWarningFocused] = useState(false);
 
   // Filters within slot
   const [topGroupFilter, setTopGroupFilter] = useState("all");
   const [topGenderFilter, setTopGenderFilter] = useState("all");
   const [footwearFilter, setFootwearFilter] = useState("all");
+
+  // Danh sách các món đồ hiện tại trên bàn ướm
+  const currentFittingItems = useMemo(() => {
+    return [
+      selectedTop,
+      selectedBottom,
+      selectedFootwear,
+      hasAccessory ? selectedAccessory : null,
+    ].filter(Boolean);
+  }, [selectedTop, selectedBottom, selectedFootwear, selectedAccessory, hasAccessory]);
+
+  // Phân tích chi tiết quy tắc đang kích hoạt và món đồ gây ra
+  const activeRuleInsight = useMemo(() => {
+    if (!rulesResult.triggered_rules || rulesResult.triggered_rules.length === 0) return null;
+    return detectOffendingItems(
+      rulesResult.triggered_rules[0],
+      currentFittingItems,
+      occasion
+    );
+  }, [rulesResult.triggered_rules, currentFittingItems, occasion]);
 
   const occasionsList = [
     { id: "di_le", name: "Đi Lễ / Viếng Chùa", icon: "🛕" },
@@ -250,17 +272,73 @@ export default function FittingStudio({
         </div>
       </div>
 
-      {/* Rule Warning Callout (If VANG or DO) */}
-      {rulesResult.level === "VANG" && rulesResult.triggered_rules.length > 0 && (
-        <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-xs text-amber-900 flex items-start gap-2.5 animate-scene-enter">
-          <AlertTriangle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
-          <div className="space-y-0.5">
-            <span className="font-bold block">
-              Lưu ý quy tắc văn hóa ({rulesResult.triggered_rules[0]?.id}):
-            </span>
-            <p className="text-[11px] text-amber-800 leading-relaxed">
-              {rulesResult.triggered_rules[0]?.message_vi}
-            </p>
+      {/* Interactive Rule Warning Callout (If VANG or DO) */}
+      {(rulesResult.level === "VANG" || rulesResult.level === "DO") && rulesResult.triggered_rules.length > 0 && activeRuleInsight && (
+        <div 
+          onClick={() => setIsWarningFocused(!isWarningFocused)}
+          className={`p-3.5 rounded-2xl text-xs transition-all cursor-pointer border shadow-xs animate-scene-enter ${
+            rulesResult.level === "DO"
+              ? "bg-rose-50 border-rose-300 text-rose-900 hover:bg-rose-100/70"
+              : "bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100/60"
+          }`}
+          title="Nhấn để xem các món đồ đang gây ra lưu ý trên outfit"
+        >
+          <div className="flex items-start gap-3">
+            <AlertTriangle className={`w-4 h-4 shrink-0 mt-0.5 ${rulesResult.level === "DO" ? "text-rose-600" : "text-amber-700"}`} />
+            <div className="space-y-1.5 flex-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-bold flex items-center gap-1.5 text-xs">
+                  <span>{rulesResult.level === "DO" ? "🛑 Cảnh báo không phù hợp văn hóa:" : "⚠️ Lưu ý quy tắc văn hóa:"}</span>
+                  <span className="font-semibold text-nep-ink/80">{activeRuleInsight.title}</span>
+                </span>
+                <span className="text-[11px] font-bold text-nep-indigo flex items-center gap-1 hover:underline">
+                  {isWarningFocused ? "Thu gọn ▲" : "Xem phần gây lưu ý 🔍"}
+                </span>
+              </div>
+
+              <p className="text-[11px] leading-relaxed opacity-95">
+                {activeRuleInsight.cleanMessage}
+              </p>
+
+              {/* Chi tiết phần gây ra lưu ý khi người dùng ấn vào */}
+              {isWarningFocused && (
+                <div className="mt-3 pt-3 border-t border-amber-300/60 flex flex-col gap-2.5 animate-in fade-in">
+                  <div className="flex items-center gap-2 text-[11px] font-bold text-nep-ink">
+                    <span>🔍 Phần đang gây lưu ý trên outfit:</span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {activeRuleInsight.offendingItems.map((offItem) => (
+                      <button
+                        key={offItem.id}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const targetSlot = offItem.slot === "bag" || offItem.slot === "headwear" || offItem.slot === "jewelry" ? "accessory" : offItem.slot as any;
+                          setActiveSlot(targetSlot);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-white border border-amber-300 hover:border-nep-red text-nep-ink text-[11px] font-bold flex items-center gap-2 shadow-2xs hover:scale-105 transition-all cursor-pointer group"
+                        title={`Nhấn để mở danh mục ${offItem.slotLabel} và đổi món khác`}
+                      >
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                        <span>{offItem.name}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 font-mono">
+                          {offItem.slotLabel}
+                        </span>
+                        <span className="text-[10px] text-nep-red group-hover:underline font-bold">Đổi món ↺</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {activeRuleInsight.suggestedAction && (
+                    <div className="p-2.5 rounded-xl bg-white/80 border border-amber-200/80 text-[11px] text-amber-950 flex items-start gap-1.5">
+                      <span className="font-bold shrink-0">💡 Gợi ý điều chỉnh:</span>
+                      <span className="leading-relaxed">{activeRuleInsight.suggestedAction}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -270,6 +348,10 @@ export default function FittingStudio({
         {slotsMeta.map((slotItem) => {
           const isActive = activeSlot === slotItem.id;
           const currentImg = slotItem.current?.asset || slotItem.current?.image_url;
+          const isOffendingSlot = activeRuleInsight && (
+            activeRuleInsight.affectedSlots.includes(slotItem.slot) ||
+            (slotItem.id === "accessory" && activeRuleInsight.affectedSlots.some(s => ["bag", "headwear", "jewelry"].includes(s)))
+          );
           return (
             <div
               key={slotItem.id}
@@ -277,6 +359,8 @@ export default function FittingStudio({
               className={`p-3 rounded-2xl transition-all cursor-pointer relative border flex flex-col justify-between ${
                 isActive
                   ? "bg-white border-nep-red ring-2 ring-nep-red/30 shadow-md scale-[1.01]"
+                  : isOffendingSlot
+                  ? "bg-amber-50/70 hover:bg-amber-100/50 border-amber-400 ring-2 ring-amber-400/50 shadow-2xs"
                   : "bg-white/70 hover:bg-white border-nep-ink/10 shadow-2xs"
               }`}
             >
@@ -284,6 +368,11 @@ export default function FittingStudio({
                 <span className="text-xs font-bold text-nep-ink flex items-center gap-1.5">
                   <span>{slotItem.icon}</span>
                   <span>{slotItem.name}</span>
+                  {isOffendingSlot && (
+                    <span className="text-[8px] font-bold text-amber-900 bg-amber-200/80 px-1.5 py-0.2 rounded border border-amber-300 animate-pulse">
+                      ⚠️ Lưu ý
+                    </span>
+                  )}
                 </span>
                 {slotItem.optional && (
                   <button

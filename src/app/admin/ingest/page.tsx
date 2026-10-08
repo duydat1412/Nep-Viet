@@ -103,7 +103,7 @@ export default function AdminStudioPage() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Lỗi khi trích xuất");
+      if (!res.ok) throw new Error(data.message || data.error || "Lỗi khi trích xuất");
       setAiResult(data.extracted_item);
     } catch (err: any) {
       setAiError(err.message || "Đã xảy ra lỗi");

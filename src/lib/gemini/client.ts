@@ -11,9 +11,9 @@ export async function callGemini(
   }
 
   const ai = new GoogleGenAI({ apiKey });
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-  const fallbackModel = process.env.GEMINI_MODEL_FALLBACK || 'gemini-2.5-pro';
-  const timeoutMs = parseInt(process.env.GEMINI_TIMEOUT_MS || '8000', 10);
+  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash';
+  const fallbackModel = process.env.GEMINI_MODEL_FALLBACK || 'gemini-3.7-flash';
+  const timeoutMs = parseInt(process.env.GEMINI_TIMEOUT_MS || '20000', 10);
 
   const attempt = async (currentModel: string, temperature: number) => {
     const controller = new AbortController();
@@ -28,7 +28,7 @@ export async function callGemini(
           responseMimeType: 'application/json',
           responseSchema,
           temperature,
-          maxOutputTokens: 700,
+          maxOutputTokens: 2500,
         },
       });
       clearTimeout(id);
@@ -48,9 +48,10 @@ export async function callGemini(
   } catch (error: any) {
     const isTimeout = error.name === 'AbortError';
     const isRateLimit = error?.status === 429 || error?.status === 503;
+    const isModelUnavailable = error?.status === 404 || error?.status === 400;
     
-    if (isTimeout || isRateLimit) {
-      console.warn(`Gemini call failed with ${error.name || error.status}. Retrying with fallback model...`);
+    if (isTimeout || isRateLimit || isModelUnavailable) {
+      console.warn(`Gemini call failed with ${error.name || error.status || error.message}. Retrying with fallback model ${fallbackModel}...`);
       return await attempt(fallbackModel, 0.0);
     }
     throw error;

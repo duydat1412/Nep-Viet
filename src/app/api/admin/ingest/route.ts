@@ -95,8 +95,8 @@ export async function POST(request: Request) {
     let detectedLocation: string | undefined = undefined;
     let detectedBrand: string | undefined = undefined;
 
-    // 1. Kiểm tra nếu là URL Shopee -> Sử dụng Shopee Extractor chuyên dụng
-    if (url && isShopeeUrl(url)) {
+    // 1. Kiểm tra nếu là URL Shopee -> Chỉ gọi Shopee API backend nếu CHƯA có content từ Bookmarklet
+    if (url && isShopeeUrl(url) && !rawText) {
       const shopeeData = await extractShopeeProduct(url);
       if (shopeeData) {
         rawText = `[SẢN PHẨM SHOPEE]
@@ -111,6 +111,15 @@ ${shopeeData.description.slice(0, 3000)}`;
         detectedPrice = shopeeData.price;
         detectedLocation = shopeeData.location;
         detectedBrand = shopeeData.brandName;
+      }
+    }
+
+    // Tự động nhận diện giá tiền từ văn bản Bookmarklet nếu có
+    if (!detectedPrice && rawText) {
+      const pMatch = rawText.match(/Giá:\s*₫?\s*([0-9.,]+)/i) || rawText.match(/₫\s*([0-9.,]+)/);
+      if (pMatch) {
+        const num = parseInt(pMatch[1].replace(/[.,]/g, ''), 10);
+        if (!isNaN(num) && num > 1000) detectedPrice = num;
       }
     }
 

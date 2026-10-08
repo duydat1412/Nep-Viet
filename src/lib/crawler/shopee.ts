@@ -66,14 +66,53 @@ export async function extractShopeeProduct(url: string): Promise<ShopeeProductDa
     });
 
     if (!apiRes.ok) {
-      console.warn(`Shopee API trả về mã lỗi: ${apiRes.status}`);
-      return null;
+      console.warn(`Shopee API trả về mã lỗi: ${apiRes.status}, thử fallback HTML meta...`);
     }
 
-    const json = await apiRes.json();
-    const data = json.data;
+    let data = null;
+    if (apiRes.ok) {
+      const json = await apiRes.json();
+      data = json.data;
+    }
+
     if (!data) {
-      console.warn('Shopee API không trả về dữ liệu data hợp lệ:', json);
+      console.warn('Shopee API không trả về dữ liệu data hợp lệ, chuyển sang fallback trích xuất HTML meta...');
+      try {
+        const pageRes = await fetch(targetUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          },
+        });
+        if (pageRes.ok) {
+          const html = await pageRes.text();
+          const titleMatch = html.match(/<meta[^>]*property=["']og:title["'][^>]*content=["']([^"']*)["']/i) ||
+                             html.match(/<title>([^<]*)<\/title>/i);
+          const imgMatch = html.match(/<meta[^>]*property=["']og:image["'][^>]*content=["']([^"']*)["']/i);
+          const descMatch = html.match(/<meta[^>]*property=["']og:description["'][^>]*content=["']([^"']*)["']/i) ||
+                            html.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["']/i);
+
+          const title = titleMatch ? titleMatch[1].replace(/\s*\|\s*Shopee.*$/i, '').trim() : '';
+          const img = imgMatch ? imgMatch[1] : undefined;
+          const desc = descMatch ? descMatch[1] : '';
+
+          if (title || img) {
+            return {
+              name: title,
+              description: desc,
+              price: 0,
+              currency: 'VND',
+              images: img ? [img] : [],
+              mainImage: img,
+              location: 'Shopee Việt Nam',
+              brandName: 'Shop Cổ Phục Shopee',
+              url: targetUrl,
+            };
+          }
+        }
+      } catch (fallbackErr) {
+        console.warn('Lỗi khi fetch HTML meta fallback Shopee:', fallbackErr);
+      }
       return null;
     }
 

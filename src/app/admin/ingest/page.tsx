@@ -83,6 +83,7 @@ export default function AdminStudioPage() {
   const [aiError, setAiError] = useState<string | null>(null);
   const [copiedJSON, setCopiedJSON] = useState(false);
   const [copiedBookmarklet, setCopiedBookmarklet] = useState(false);
+  const [appOrigin, setAppOrigin] = useState("http://localhost:3000");
 
   // Function to execute Ingestion (called directly or from Bookmarklet)
   const executeIngest = async (targetUrl: string, targetContent: string, targetImg?: string) => {
@@ -130,8 +131,8 @@ export default function AdminStudioPage() {
   useEffect(() => {
     fetchProducts();
 
-    // Tự động xử lý nếu trang được mở từ Bookmarklet Shopee
     if (typeof window !== "undefined") {
+      setAppOrigin(window.location.origin);
       const params = new URLSearchParams(window.location.search);
       const incomingUrl = params.get("shopee_url") || params.get("url");
       const incomingContent = params.get("content");
@@ -1118,39 +1119,45 @@ export default function AdminStudioPage() {
                 </p>
 
                 <div className="flex flex-wrap items-center gap-2.5 pt-1">
-                  <a
-                    href="javascript:(function(){try{var u=window.location.href;var t=(document.querySelector('div.V3HquR')||document.querySelector('h1')||document.querySelector('title')||{}).innerText||document.title||'';var p=(document.querySelector('.pqTWkA')||document.querySelector('.G274Sr')||{}).innerText||'';var imgEl=document.querySelector('.Y5q01b img')||document.querySelector('meta[property=\'og:image\']');var img=imgEl?(imgEl.src||imgEl.content||''):'';var d=(document.querySelector('div.f7VU2S')||document.querySelector('.product-detail')||{}).innerText||'';var endpoint='http://localhost:3000/admin/ingest?source=bookmarklet&shopee_url='+encodeURIComponent(u)+'&content='+encodeURIComponent(t+(p?('\\nGiá: '+p):'')+(d?('\\n'+d.slice(0,1500)):''))+(img?('&image_url='+encodeURIComponent(img)):'');window.open(endpoint,'_blank');}catch(e){alert('Lỗi Bookmarklet: '+e.message);}})();"
-                    onClick={(e) => {
-                      alert('💡 Hướng dẫn: Bạn hãy KÉO THẢ nút này lên thanh Bookmark (Dấu trang) của trình duyệt. Sau đó khi lướt Shopee, chỉ cần bấm vào Bookmark là xong!');
-                    }}
-                    className="px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-grab active:cursor-grabbing transition-transform select-none"
-                    title="Kéo nút này thả lên thanh Bookmark của trình duyệt"
-                  >
-                    <span>🛍️ Kéo Lên Bookmark: Lưu Vào Nếp Việt</span>
-                  </a>
+                  {(() => {
+                    const bookmarkletHref = `javascript:(function(){try{var u=window.location.href;var cleanTitle=document.title.replace(/\\s*\\|\\s*Shopee.*$/i,'').trim();var titleEl=document.querySelector('div.V3HquR, h1, [class*="attire-title"], [class*="product-title"]');var t=(titleEl&&titleEl.innerText)?titleEl.innerText.trim():cleanTitle;var priceEl=document.querySelector('.pqTWkA, .G274Sr, [class*="price"], [class*="Price"]');var p=priceEl?priceEl.innerText.trim():'';if(!p){var priceMatch=document.body.innerText.match(/₫\\s*[\\d\\.,]+/);if(priceMatch) p=priceMatch[0];}var ogImg=document.querySelector('meta[property="og:image"]');var imgEl=document.querySelector('.Y5q01b img, img[src*="susercontent.com"]');var img=(ogImg&&ogImg.content)?ogImg.content:(imgEl?imgEl.src:'');var descEl=document.querySelector('div.f7VU2S, div.e8duaM, [class*="product-detail"], [class*="description"]');var d=descEl?descEl.innerText.trim():'';if(!d){var bodyText=document.body.innerText;var idx=bodyText.indexOf('MÔ TẢ SẢN PHẨM');if(idx!==-1) d=bodyText.slice(idx, idx+1500);}var endpoint='${appOrigin}/admin/ingest?source=bookmarklet&shopee_url='+encodeURIComponent(u)+'&content='+encodeURIComponent(t+(p?('\\nGiá: '+p):'')+(d?('\\n'+d.slice(0,1800)):''))+(img?('&image_url='+encodeURIComponent(img)):'');window.open(endpoint,'_blank');}catch(e){alert('Lỗi Bookmarklet: '+e.message);}})();`;
+                    return (
+                      <>
+                        <a
+                          href={bookmarkletHref}
+                          onClick={(e) => {
+                            alert('💡 Hướng dẫn: Bạn hãy KÉO THẢ nút này lên thanh Bookmark (Dấu trang) của trình duyệt. Sau đó khi lướt sản phẩm Shopee trên web, chỉ cần bấm vào Bookmark này là Nếp Việt sẽ tự mở ra và lưu sản phẩm!');
+                          }}
+                          className="px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-grab active:cursor-grabbing transition-transform select-none"
+                          title="Kéo nút này thả lên thanh Bookmark của trình duyệt"
+                        >
+                          <span>🛍️ Kéo Lên Bookmark: Lưu Vào Nếp Việt</span>
+                        </a>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const code = "javascript:(function(){try{var u=window.location.href;var t=(document.querySelector('div.V3HquR')||document.querySelector('h1')||document.querySelector('title')||{}).innerText||document.title||'';var p=(document.querySelector('.pqTWkA')||document.querySelector('.G274Sr')||{}).innerText||'';var imgEl=document.querySelector('.Y5q01b img')||document.querySelector('meta[property=\\'og:image\\']');var img=imgEl?(imgEl.src||imgEl.content||''):'';var d=(document.querySelector('div.f7VU2S')||document.querySelector('.product-detail')||{}).innerText||'';var endpoint='http://localhost:3000/admin/ingest?source=bookmarklet&shopee_url='+encodeURIComponent(u)+'&content='+encodeURIComponent(t+(p?('\\nGiá: '+p):'')+(d?('\\n'+d.slice(0,1500)):''))+(img?('&image_url='+encodeURIComponent(img)):'');window.open(endpoint,'_blank');}catch(e){alert('Lỗi Bookmarklet: '+e.message);}})();";
-                      navigator.clipboard.writeText(code);
-                      setCopiedBookmarklet(true);
-                      setTimeout(() => setCopiedBookmarklet(false), 2500);
-                    }}
-                    className="px-3.5 py-2 rounded-full bg-white hover:bg-amber-50 text-amber-900 text-xs font-semibold border border-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
-                  >
-                    {copiedBookmarklet ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span className="text-emerald-700 font-bold">Đã sao chép mã!</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(bookmarkletHref);
+                            setCopiedBookmarklet(true);
+                            setTimeout(() => setCopiedBookmarklet(false), 2500);
+                          }}
+                          className="px-3.5 py-2 rounded-full bg-white hover:bg-amber-50 text-amber-900 text-xs font-semibold border border-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
+                        >
+                          {copiedBookmarklet ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-600" />
+                              <span className="text-emerald-700 font-bold">Đã sao chép mã!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-amber-800" />
+                              <span>Sao chép mã Javascript</span>
+                            </>
+                          )}
+                        </button>
                       </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-amber-800" />
-                        <span>Sao chép mã Javascript</span>
-                      </>
-                    )}
-                  </button>
+                    );
+                  })()}
                 </div>
               </div>
 

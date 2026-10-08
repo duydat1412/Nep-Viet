@@ -1,5 +1,55 @@
 [
   {
+    "id": "ao_ngu_than_moc_an_01",
+    "slot": "top",
+    "group": "ao_ngu_than",
+    "name_vi": "Áo dài nam ngũ thân truyền thống Mộc An vải linen cao cấp",
+    "gender": "nam",
+    "colors": [
+      {
+        "name": "Đỏ",
+        "hex": "#B5362B"
+      }
+    ],
+    "formality": 4,
+    "occasions": [
+      "tet",
+      "ky_yeu",
+      "di_le",
+      "bieu_dien"
+    ],
+    "style_levels": [
+      "truyen_thong"
+    ],
+    "tags": [
+      "áo dài nam",
+      "ngũ thân",
+      "mộc an",
+      "linen"
+    ],
+    "asset": "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-mfqu7wovd7v130",
+    "source_ids": [
+      "N1"
+    ],
+    "status": "draft",
+    "brand": {
+      "name": "Mộc An ÁO DÀI",
+      "location": "Thành phố Hà Nội",
+      "url": "https://shopee.vn/%C3%81o-d%C3%A0i-nam-truy%E1%BB%81n-th%E1%BB%91ng-M%E1%BB%98C-AN-ki%E1%BB%83u-d%C3%A1ng-ng%C5%A9-th%C3%A2n-form-chu%E1%BA%A9n-v%E1%BA%A3i-cao-c%E1%BA%A5p-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-i.1187942782.27266146257?extraParams=%7B%22display_model_id%22%3A187940095212%2C%22model_selection_logic%22%3A3%7D"
+    },
+    "pricing": {
+      "buy_price": 400000,
+      "currency": "VND",
+      "is_estimate": false,
+      "note": "Sản phẩm may sẵn bán trên sàn Shopee (mua trực tiếp, không hỗ trợ cho thuê hoặc may đo riêng)",
+      "pricing_type": "may_san_tmdt"
+    },
+    "material": "Vải linen cao cấp",
+    "craftsmanship_lore": "Áo dài ngũ thân truyền thống kết hợp chất liệu linen hiện đại mang lại vẻ đẹp lịch lãm, tôn vinh giá trị may mặc cổ truyền Việt Nam.",
+    "channel": "san_tmdt_shopee",
+    "origin_url": "https://shopee.vn/%C3%81o-d%C3%A0i-nam-truy%E1%BB%81n-th%E1%BB%91ng-M%E1%BB%98C-AN-ki%E1%BB%83u-d%C3%A1ng-ng%C5%A9-th%C3%A2n-form-chu%E1%BA%A9n-v%E1%BA%A3i-cao-c%E1%BA%A5p-H%C3%A0ng-Ch%C3%ADnh-H%C3%A3ng-i.1187942782.27266146257?extraParams=%7B%22display_model_id%22%3A187940095212%2C%22model_selection_logic%22%3A3%7D"
+  },
+  {
     "id": "ao_ngu_than_nam_xanh_01",
     "slot": "top",
     "group": "ao_ngu_than",

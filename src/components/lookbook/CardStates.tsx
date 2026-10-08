@@ -4,8 +4,8 @@ import { Sparkles, AlertTriangle, BookOpen, RotateCcw } from "lucide-react";
 
 export function LoadingSkeleton() {
   return (
-    <div className="w-[360px] min-h-[640px] bg-nep-paper/90 backdrop-blur-sm shadow-2xl rounded-2xl border border-nep-ink/10 p-6 flex flex-col items-center justify-between">
-      <div className="animate-pulse flex flex-col items-center w-full">
+    <div className="w-[360px] min-h-[640px] bg-nep-paper/90 backdrop-blur-sm shadow-2xl rounded-2xl border border-nep-ink/10 p-6 flex flex-col items-center justify-between animate-scene-enter">
+      <div className="animate-pulse-soft flex flex-col items-center w-full">
         {/* Header skeleton */}
         <div className="h-6 w-32 bg-nep-ink/10 rounded-full mb-2"></div>
         <div className="h-3 w-20 bg-nep-ink/5 rounded-full mb-6"></div>
@@ -35,7 +35,7 @@ export function LoadingSkeleton() {
 
 export function ErrorCard({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="w-[360px] min-h-[500px] bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border border-rose-200 p-6 flex flex-col items-center justify-center text-center">
+    <div className="w-[360px] min-h-[500px] bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border border-rose-200 p-6 flex flex-col items-center justify-center text-center animate-scene-enter">
       <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-4 border border-rose-100 shadow-xs">
         <AlertTriangle className="w-6 h-6" />
       </div>
@@ -55,7 +55,7 @@ export function ErrorCard({ message, onRetry }: { message: string; onRetry: () =
 
 export function ChuaDuCanCuCard({ message, thieu_can_cu }: { message: string; thieu_can_cu: string[] }) {
   return (
-    <div className="w-[360px] min-h-[560px] bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border border-nep-ink/10 p-6 flex flex-col items-center justify-center text-center">
+    <div className="w-[360px] min-h-[560px] bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl border border-nep-ink/10 p-6 flex flex-col items-center justify-center text-center animate-scene-enter">
       <div className="w-12 h-12 rounded-2xl bg-nep-paper text-nep-ink/70 flex items-center justify-center mb-4 border border-nep-ink/10 shadow-xs">
         <BookOpen className="w-6 h-6 text-nep-gold" />
       </div>

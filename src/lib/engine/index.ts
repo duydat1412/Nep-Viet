@@ -50,6 +50,15 @@ export function runEngine(input: { occasion: string, group: string, gender: stri
     if (a.rules_result.level !== 'XANH' && b.rules_result.level === 'XANH') return 1;
     if (a.rules_result.level === 'VANG' && b.rules_result.level !== 'VANG') return -1;
     if (a.rules_result.level !== 'VANG' && b.rules_result.level === 'VANG') return 1;
+
+    if (input.tone) {
+      const targetTone = input.tone;
+      const aToneMatch = a.combo.items.some(i => i.tags?.includes('mau_' + targetTone) || i.tags?.includes(targetTone));
+      const bToneMatch = b.combo.items.some(i => i.tags?.includes('mau_' + targetTone) || i.tags?.includes(targetTone));
+      if (aToneMatch && !bToneMatch) return -1;
+      if (!aToneMatch && bToneMatch) return 1;
+    }
+
     return b.harmony_result.score - a.harmony_result.score;
   });
 

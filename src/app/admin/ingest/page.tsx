@@ -28,9 +28,22 @@ import {
 } from "lucide-react";
 import SmartImageCropperModal, { CropCoords, SLOT_PRESETS } from "@/components/admin/SmartImageCropperModal";
 import { AVAILABLE_GEMINI_MODELS } from "@/lib/constants/models";
+import ToastContainer, { ToastMessage } from "@/components/ui/Toast";
 
 export default function AdminStudioPage() {
   const [activeTab, setActiveTab] = useState<"catalog" | "manual" | "ai">("catalog");
+
+  // --- TOAST NOTIFICATIONS ---
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const showToast = (toast: Omit<ToastMessage, "id">) => {
+    const id = `toast_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+    setToasts((prev) => [...prev, { ...toast, id }]);
+  };
+
+  const dismissToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   // --- CATALOG LIST STATES ---
   const [products, setProducts] = useState<any[]>([]);
@@ -123,8 +136,22 @@ export default function AdminStudioPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.error || "Lỗi khi trích xuất");
       setAiResult(data.extracted_item);
+      showToast({
+        type: "success",
+        title: "Bóc tách AI thành công!",
+        message: `Đã nhận diện '${data.extracted_item.name_vi}'. Bấm 'Chuyển Sang Form Điền' để lưu vào kho.`,
+        badge: data.extracted_item.used_model || selectedAiModel,
+        duration: 4500,
+      });
     } catch (err: any) {
-      setAiError(err.message || "Đã xảy ra lỗi");
+      const errMsg = err.message || "Đã xảy ra lỗi khi trích xuất";
+      setAiError(errMsg);
+      showToast({
+        type: "error",
+        title: "Lỗi trích xuất AI",
+        message: errMsg,
+        duration: 5000,
+      });
     } finally {
       setAiLoading(false);
     }
@@ -188,11 +215,24 @@ export default function AdminStudioPage() {
 
       setFormAsset(data.url);
       setUploadNotice(`Ảnh đã được tải lên thành công (${data.storage === "r2" ? "Cloudflare R2" : "Local Storage"})!`);
+      showToast({
+        type: "success",
+        title: "Tải ảnh thành công",
+        message: `Đã lưu ảnh lên ${data.storage === "r2" ? "Cloudflare R2" : "Local Storage"}.`,
+        duration: 3000,
+      });
       if (data.warning) {
         setUploadWarning(data.warning);
       }
     } catch (err: any) {
-      setUploadWarning(err.message || "Tải ảnh thất bại");
+      const errMsg = err.message || "Tải ảnh thất bại";
+      setUploadWarning(errMsg);
+      showToast({
+        type: "error",
+        title: "Tải ảnh thất bại",
+        message: errMsg,
+        duration: 4000,
+      });
     } finally {
       setUploadingImage(false);
     }
@@ -284,9 +324,20 @@ export default function AdminStudioPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Không thể xóa sản phẩm");
+      showToast({
+        type: "info",
+        title: "Đã xóa sản phẩm",
+        message: `Sản phẩm '${id}' đã được gỡ khỏi kho cổ phục.`,
+        duration: 3500,
+      });
       await fetchProducts();
     } catch (err: any) {
-      alert(err.message || "Lỗi khi xóa");
+      showToast({
+        type: "error",
+        title: "Lỗi khi xóa",
+        message: err.message || "Không thể xóa sản phẩm",
+        duration: 4500,
+      });
     }
   };
 
@@ -361,18 +412,48 @@ export default function AdminStudioPage() {
         throw new Error(data.error || "Không thể lưu sản phẩm");
       }
 
+      const savedName = data.item?.name_vi || formNameVi;
+      const savedId = data.item?.id || formId;
+      const isShopee = (data.item?.channel || formChannel) === "san_tmdt_shopee" || Boolean(data.item?.brand?.url?.includes("shopee"));
+
+      showToast({
+        type: "success",
+        title: isEditing ? "Cập nhật sản phẩm thành công!" : "Đã lưu sản phẩm vào kho!",
+        message: `${savedName} (${savedId}) đã được lưu trữ an toàn vào hệ thống.`,
+        badge: isShopee ? "🛍️ Shopee May Sẵn" : "🧵 May Đo Thủ Công",
+        duration: 4500,
+        action: {
+          label: "Xem trong kho",
+          onClick: () => {
+            setActiveTab("catalog");
+            setSearchQuery(savedName);
+          },
+        },
+      });
+
       setFormSuccessMessage(
         isEditing
-          ? `Đã cập nhật sản phẩm '${data.item.name_vi}' thành công!`
-          : `Đã thêm mới sản phẩm '${data.item.name_vi}' vào kho!`
+          ? `Đã cập nhật sản phẩm '${savedName}' thành công!`
+          : `Đã thêm mới sản phẩm '${savedName}' vào kho!`
       );
       await fetchProducts();
+
+      // Chuyển êm ái sang tab Kho sản phẩm và tìm kiếm món vừa lưu
+      setActiveTab("catalog");
+      setSearchQuery(savedName);
 
       if (!isEditing) {
         resetForm();
       }
     } catch (err: any) {
-      setFormErrorMessage(err.message || "Đã xảy ra lỗi");
+      const errMsg = err.message || "Đã xảy ra lỗi khi lưu sản phẩm";
+      setFormErrorMessage(errMsg);
+      showToast({
+        type: "error",
+        title: "Lỗi lưu sản phẩm",
+        message: errMsg,
+        duration: 5000,
+      });
     } finally {
       setSavingProduct(false);
     }
@@ -390,6 +471,12 @@ export default function AdminStudioPage() {
         image_url: croppedUrl,
       }));
     }
+    showToast({
+      type: "success",
+      title: "Cắt ảnh thông minh thành công!",
+      message: "Đã tách riêng trang phục theo kích thước chuẩn và cập nhật ảnh.",
+      duration: 3500,
+    });
   };
 
   // AI Ingestion Handler
@@ -499,7 +586,7 @@ export default function AdminStudioPage() {
 
         {/* ================= TAB 1: CATALOG INVENTORY ================= */}
         {activeTab === "catalog" && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-scene-enter">
             {/* Search and Filters */}
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-nep-ink/10 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="relative w-full md:w-80">
@@ -566,9 +653,53 @@ export default function AdminStudioPage() {
 
             {/* Product Grid */}
             {loadingProducts ? (
-              <div className="py-20 flex flex-col items-center justify-center text-nep-ink/60">
-                <RefreshCw className="w-6 h-6 animate-spin text-nep-red mb-2" />
-                <span className="text-xs">Đang tải kho sản phẩm...</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[1, 2, 3, 4, 5, 6].map((idx) => (
+                  <div
+                    key={`skel_${idx}`}
+                    className="bg-white/70 rounded-2xl border border-nep-ink/10 p-4 shadow-2xs flex flex-col justify-between animate-pulse-soft"
+                  >
+                    <div>
+                      {/* Top Badges Skeleton */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-1.5">
+                          <div className="h-4 w-16 rounded-md bg-nep-ink/10" />
+                          <div className="h-4 w-20 rounded-md bg-nep-ink/10" />
+                        </div>
+                        <div className="h-3 w-12 rounded bg-nep-ink/10" />
+                      </div>
+
+                      {/* Image & Details Skeleton */}
+                      <div className="flex gap-3 mb-3">
+                        <div className="w-20 h-24 bg-nep-paper/70 rounded-xl border border-nep-ink/5 shrink-0" />
+                        <div className="flex-1 space-y-2 py-1">
+                          <div className="h-4 w-4/5 rounded bg-nep-ink/10" />
+                          <div className="h-3 w-3/5 rounded bg-nep-ink/10" />
+                          <div className="h-3 w-2/5 rounded bg-nep-ink/10" />
+                          <div className="flex items-center gap-1.5 pt-1">
+                            <div className="w-3 h-3 rounded-full bg-nep-ink/10" />
+                            <div className="h-2.5 w-12 rounded bg-nep-ink/10" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Pricing Skeleton */}
+                      <div className="p-2.5 rounded-xl bg-nep-paper/40 border border-nep-ink/5 space-y-1 mb-3">
+                        <div className="h-3 w-20 rounded bg-nep-ink/10" />
+                        <div className="h-4 w-28 rounded bg-nep-ink/10" />
+                      </div>
+                    </div>
+
+                    {/* Actions Skeleton */}
+                    <div className="flex items-center justify-between pt-2 border-t border-nep-ink/5">
+                      <div className="h-3 w-16 rounded bg-nep-ink/10" />
+                      <div className="flex items-center gap-1">
+                        <div className="w-7 h-7 rounded-lg bg-nep-ink/10" />
+                        <div className="w-7 h-7 rounded-lg bg-nep-ink/10" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="p-12 text-center bg-white/60 rounded-2xl border border-nep-ink/10">
@@ -762,7 +893,7 @@ export default function AdminStudioPage() {
 
         {/* ================= TAB 2: MANUAL ADD / EDIT (WITH R2 UPLOAD) ================= */}
         {activeTab === "manual" && (
-          <div className="bg-white/90 backdrop-blur-sm p-6 sm:p-8 rounded-3xl border border-nep-ink/10 shadow-sm">
+          <div className="bg-white/90 backdrop-blur-sm p-6 sm:p-8 rounded-3xl border border-nep-ink/10 shadow-sm animate-scene-enter">
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-nep-ink/10">
               <div>
                 <h2 className="font-heading text-xl font-bold text-nep-ink flex items-center gap-2">
@@ -1386,7 +1517,7 @@ export default function AdminStudioPage() {
 
         {/* ================= TAB 3: AI QUICK INGESTION ================= */}
         {activeTab === "ai" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-scene-enter">
             <div className="lg:col-span-6 bg-white/80 backdrop-blur-sm p-6 rounded-3xl border border-nep-ink/10 shadow-sm">
               <h2 className="font-heading text-lg font-bold text-nep-ink mb-1 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-nep-red" />
@@ -1435,6 +1566,12 @@ export default function AdminStudioPage() {
                             navigator.clipboard.writeText(bookmarkletHref);
                             setCopiedBookmarklet(true);
                             setTimeout(() => setCopiedBookmarklet(false), 2500);
+                            showToast({
+                              type: "success",
+                              title: "Đã sao chép Bookmarklet!",
+                              message: "Tạo bookmark mới trên trình duyệt và dán mã này vào URL để dùng 1-click trên Shopee.",
+                              duration: 4000,
+                            });
                           }}
                           className="px-3.5 py-2 rounded-full bg-white hover:bg-amber-50 text-amber-900 text-xs font-semibold border border-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
                         >
@@ -1706,6 +1843,12 @@ export default function AdminStudioPage() {
                       navigator.clipboard.writeText(JSON.stringify(aiResult, null, 2));
                       setCopiedJSON(true);
                       setTimeout(() => setCopiedJSON(false), 2000);
+                      showToast({
+                        type: "info",
+                        title: "Đã sao chép JSON",
+                        message: "Dữ liệu JSON của sản phẩm đã được lưu vào bộ nhớ tạm.",
+                        duration: 3000,
+                      });
                     }}
                     className="p-2 rounded-full border border-nep-ink/15 hover:bg-white text-xs cursor-pointer"
                     title="Copy JSON"
@@ -1718,6 +1861,9 @@ export default function AdminStudioPage() {
           </div>
         )}
       </div>
+
+      {/* TOAST NOTIFICATION CONTAINER */}
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
 
       {/* SMART IMAGE CROPPER MODAL */}
       <SmartImageCropperModal

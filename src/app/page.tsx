@@ -398,43 +398,6 @@ export default function Home() {
             </div>
           </div>
 
-          <nav className="hidden lg:flex items-center gap-1.5 bg-surface-container-low/90 p-1 rounded-full border border-nep-ink/10 shadow-2xs">
-            <button
-              type="button"
-              onClick={() => {
-                setCreationMode("fitting");
-                const el = document.getElementById("studio-workspace");
-                el?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                creationMode === "fitting"
-                  ? "bg-primary-container text-on-primary shadow-xs"
-                  : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              }`}
-            >
-              <Scissors className="w-3.5 h-3.5 text-nep-gold" />
-              <span>Ướm Thử Tự Do</span>
-              <span className="text-[10px] px-1.5 py-0.2 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Live</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setCreationMode("wizard");
-                const el = document.getElementById("studio-workspace");
-                el?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                creationMode === "wizard"
-                  ? "bg-primary-container text-on-primary shadow-xs"
-                  : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-nep-gold" />
-              <span>AI Giám Tuyển</span>
-            </button>
-          </nav>
-
           <div className="flex items-center gap-2.5 shrink-0">
             <button
               onClick={() => setSavedLooksOpen(true)}
@@ -527,19 +490,16 @@ export default function Home() {
             </div>
           </header>
 
-          {/* 3. MAIN SPLIT ATELIER GRID (Two Columns Layout) */}
-          <div id="studio-workspace" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
-            
-            {/* CỘT TRÁI: Interactive Styling Studio / Fitting Room (~58%) */}
-            <section className="lg:col-span-7 flex flex-col gap-6">
-              
-              {/* CHUYỂN ĐỔI CHẾ ĐỘ TẠO LOOKBOOK */}
-              <div className="bg-surface-container-lowest p-2 rounded-2xl shadow-sm border border-nep-ink/10 flex flex-col sm:flex-row items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 w-full sm:w-auto">
+          {/* 3. MAIN ATELIER WORKSPACE */}
+          <div id="studio-workspace" className="flex flex-col gap-6 lg:gap-8">
+            {/* DUY NHẤT 1 VỊ TRÍ ĐIỀU KHIỂN & HIỂN THỊ CHẾ ĐỘ TẠO LOOKBOOK */}
+            <section aria-label="Chế độ tạo Lookbook">
+              <div className="bg-surface-container-lowest p-2.5 sm:p-3 rounded-2xl shadow-xs border border-nep-ink/10 flex flex-col md:flex-row items-center justify-between gap-3">
+                <div className="flex items-center gap-2 w-full md:w-auto">
                   <button
                     type="button"
                     onClick={() => setCreationMode("fitting")}
-                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex-1 md:flex-initial flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       creationMode === "fitting"
                         ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container"
                         : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
@@ -547,13 +507,17 @@ export default function Home() {
                   >
                     <Scissors className="w-4 h-4 text-nep-gold" />
                     <span>Ướm Thử Tự Do</span>
-                    <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Trực quan</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded font-mono uppercase font-bold ${
+                      creationMode === "fitting" ? "bg-white/20 text-white" : "bg-nep-gold/20 text-nep-gold"
+                    }`}>
+                      Trực quan
+                    </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setCreationMode("wizard")}
-                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    className={`flex-1 md:flex-initial flex items-center justify-center gap-2.5 px-5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       creationMode === "wizard"
                         ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container"
                         : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
@@ -561,19 +525,36 @@ export default function Home() {
                   >
                     <Sparkles className="w-4 h-4 text-nep-gold" />
                     <span>AI Giám Tuyển</span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded font-mono uppercase font-bold ${
+                      creationMode === "wizard" ? "bg-white/20 text-white" : "bg-nep-ink/10 text-nep-ink/60"
+                    }`}>
+                      Điền form
+                    </span>
                   </button>
                 </div>
 
-                <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-on-surface-variant px-3 py-1 bg-surface-container-low rounded-xl">
+                <div className="flex items-center gap-2 text-xs text-on-surface-variant px-3.5 py-1.5 bg-surface-container-low rounded-xl w-full md:w-auto justify-center md:justify-start">
                   {creationMode === "fitting" ? (
-                    <span>💡 Tự do ghép từng món &amp; xem thẻ Lookbook cập nhật song song</span>
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shrink-0" />
+                      <span>Tự do ghép từng món từ album di sản · Thẻ Lookbook cập nhật song song trực tiếp (0ms)</span>
+                    </>
                   ) : (
-                    <span>🤖 AI giám tuyển bộ phối toàn diện theo điển chế &amp; nhu cầu</span>
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-nep-gold shrink-0" />
+                      <span>AI khảo cứu điển chế &amp; đề xuất bộ phối toàn diện theo bối cảnh, sự kiện</span>
+                    </>
                   )}
                 </div>
               </div>
+            </section>
 
-              {creationMode === "fitting" ? (
+            {/* SPLIT ATELIER GRID (Two Columns Layout) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+              
+              {/* CỘT TRÁI: Interactive Styling Studio / Fitting Room (~58%) */}
+              <section className="lg:col-span-7 flex flex-col gap-6">
+                {creationMode === "fitting" ? (
                 <FittingStudio
                   items={catalogItems}
                   selectedTop={fittingTop}
@@ -939,10 +920,6 @@ export default function Home() {
           <aside id="lookbook" className="lg:col-span-5 flex flex-col gap-4 lg:sticky lg:top-24">
             {creationMode === "fitting" ? (
               <div className="flex flex-col items-center w-full">
-                <div className="w-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-[11px] font-semibold text-center py-1.5 px-3 rounded-full mb-2 flex items-center justify-center gap-2 shadow-2xs">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
-                  <span className="font-bold">ƯỚM THỬ TRỰC TIẾP · LIVE PREVIEW SONG SONG (0ms)</span>
-                </div>
                 <LookbookCard
                   onOpenSource={(srcId) => {
                     setFocusedSourceId(srcId);
@@ -1046,6 +1023,7 @@ export default function Home() {
               )}
             </aside>
           </div>
+        </div>
 
           {/* 4. BOTTOM CULTURAL FOOTNOTE RIBBON */}
           <footer className="mt-16 p-6 lg:p-8 rounded-2xl bg-surface-container-low border border-nep-ink/5 shadow-sm">

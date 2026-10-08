@@ -1,10 +1,22 @@
 import { NextResponse } from 'next/server';
 import { callGemini } from '@/lib/gemini/client';
+import { isShopeeUrl, extractShopeeProduct } from '@/lib/crawler/shopee';
 
-export const maxDuration = 20;
+export const maxDuration = 25;
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+// Xử lý CORS Preflight cho Bookmarklet
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
 
 const INGEST_SYSTEM_PROMPT = `Bạn là Trợ lý Giám tuyển Di sản Nếp Việt (AI Heritage Ingestion Agent).
-Nhiệm vụ: Phân tích bài viết hoặc thông tin mô tả sản phẩm Việt phục thô, chuẩn hóa thành dữ liệu có cấu trúc cho hệ sinh thái Nếp Việt.
+Nhiệm vụ: Phân tích bài viết hoặc thông tin mô tả sản phẩm Việt phục thô (kể cả từ Shopee), chuẩn hóa thành dữ liệu có cấu trúc cho hệ sinh thái Nếp Việt.
 Quy tắc:
 1. Xác định đúng nhóm trang phục (group: ao_ngu_than, ao_dai, ao_tac, ao_tu_than, ao_nhat_binh, phu_kien) và vị trí mặc (slot: top, bottom, outer, footwear, bag, jewelry).
 2. Ước lượng mã màu HEX đại diện cho sản phẩm (ví dụ: xanh chàm #26466D, trắng ngà #F8F9FA, đỏ son #B5362B...).
@@ -68,24 +80,46 @@ const INGEST_RESPONSE_SCHEMA = {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { url, content, image_url } = body;
+    const { url, content, image_url, source } = body;
 
     if (!url && !content) {
       return NextResponse.json(
         { error: 'Vui lòng cung cấp URL bài viết hoặc đoạn văn bản mô tả sản phẩm' },
-        { status: 400 }
+        { status: 400, headers: corsHeaders }
       );
     }
 
     let rawText = content || '';
+    let detectedImage = image_url || '';
+    let detectedPrice: number | undefined = undefined;
+    let detectedLocation: string | undefined = undefined;
+    let detectedBrand: string | undefined = undefined;
 
-    // Nếu người dùng cung cấp URL, thử cào nội dung text cơ bản
-    if (url && !content) {
+    // 1. Kiểm tra nếu là URL Shopee -> Sử dụng Shopee Extractor chuyên dụng
+    if (url && isShopeeUrl(url)) {
+      const shopeeData = await extractShopeeProduct(url);
+      if (shopeeData) {
+        rawText = `[SẢN PHẨM SHOPEE]
+Tên: ${shopeeData.name}
+Giá niêm yết: ${shopeeData.price.toLocaleString()} VNĐ (Khoảng: ${shopeeData.priceMin?.toLocaleString()} - ${shopeeData.priceMax?.toLocaleString()} VNĐ)
+Địa chỉ shop: ${shopeeData.location}
+Thương hiệu: ${shopeeData.brandName}
+Mô tả chi tiết:
+${shopeeData.description.slice(0, 3000)}`;
+
+        detectedImage = detectedImage || shopeeData.mainImage || shopeeData.images[0] || '';
+        detectedPrice = shopeeData.price;
+        detectedLocation = shopeeData.location;
+        detectedBrand = shopeeData.brandName;
+      }
+    }
+
+    // 2. Nếu là URL thông thường khác và chưa có content -> Fetch HTML cơ bản
+    if (url && !rawText) {
       try {
         const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; NepVietAgent/1.0)' } });
         if (res.ok) {
           const html = await res.text();
-          // Lược bỏ HTML tags để lấy văn bản thuần
           rawText = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
                         .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
                         .replace(/<[^>]+>/g, ' ')
@@ -100,27 +134,50 @@ export async function POST(request: Request) {
 
     const userPrompt = `DỮ LIỆU ĐẦU VÀO ĐỂ BÓC TÁCH:
 - Nguồn / URL: ${url || 'Không có'}
-- Ảnh sản phẩm: ${image_url || 'Chưa cung cấp'}
+- Ảnh sản phẩm: ${detectedImage || 'Chưa cung cấp'}
 - Nội dung mô tả / bài đăng:
 ${rawText || 'Hãy tạo một sản phẩm mẫu theo thông tin từ URL.'}`;
 
-    // Gọi Gemini trích xuất có cấu trúc
+    // 3. Gọi Gemini trích xuất có cấu trúc
     const extractedItem = await callGemini(INGEST_SYSTEM_PROMPT, userPrompt, INGEST_RESPONSE_SCHEMA);
 
-    return NextResponse.json({
-      success: true,
-      extracted_item: {
-        ...extractedItem,
-        asset: image_url || extractedItem.image_url || '/assets/items/ao_ngu_than_nam_xanh_01.png',
-        source_ids: ['N1'],
-        status: 'draft'
-      }
-    });
+    // Ghi đè giá và brand url từ Shopee nếu có
+    if (detectedPrice && detectedPrice > 0) {
+      extractedItem.pricing = {
+        ...extractedItem.pricing,
+        buy_price: detectedPrice,
+        currency: 'VND',
+      };
+    }
+    if (url) {
+      extractedItem.brand = {
+        ...extractedItem.brand,
+        url: url,
+        location: detectedLocation || extractedItem.brand?.location || 'Việt Nam',
+        name: detectedBrand || extractedItem.brand?.name || 'Thương hiệu Cổ Phục',
+      };
+    }
+
+    const finalAsset = detectedImage || extractedItem.image_url || '/assets/items/ao_ngu_than_nam_xanh_01.png';
+
+    return NextResponse.json(
+      {
+        success: true,
+        extracted_item: {
+          ...extractedItem,
+          asset: finalAsset,
+          image_url: finalAsset,
+          source_ids: ['N1'],
+          status: 'draft',
+        },
+      },
+      { headers: corsHeaders }
+    );
   } catch (error: any) {
     console.error('Lỗi Ingest API:', error);
     return NextResponse.json(
       { error: 'Không thể trích xuất dữ liệu sản phẩm', message: error.message },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

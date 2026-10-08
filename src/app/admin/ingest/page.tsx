@@ -82,6 +82,34 @@ export default function AdminStudioPage() {
   const [aiResult, setAiResult] = useState<any>(null);
   const [aiError, setAiError] = useState<string | null>(null);
   const [copiedJSON, setCopiedJSON] = useState(false);
+  const [copiedBookmarklet, setCopiedBookmarklet] = useState(false);
+
+  // Function to execute Ingestion (called directly or from Bookmarklet)
+  const executeIngest = async (targetUrl: string, targetContent: string, targetImg?: string) => {
+    setAiLoading(true);
+    setAiError(null);
+    setAiResult(null);
+
+    try {
+      const res = await fetch("/api/admin/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: targetUrl,
+          content: targetContent,
+          image_url: targetImg,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Lỗi khi trích xuất");
+      setAiResult(data.extracted_item);
+    } catch (err: any) {
+      setAiError(err.message || "Đã xảy ra lỗi");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // Load products catalog
   const fetchProducts = async () => {
@@ -101,6 +129,21 @@ export default function AdminStudioPage() {
 
   useEffect(() => {
     fetchProducts();
+
+    // Tự động xử lý nếu trang được mở từ Bookmarklet Shopee
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const incomingUrl = params.get("shopee_url") || params.get("url");
+      const incomingContent = params.get("content");
+      const incomingImg = params.get("image_url");
+
+      if (incomingUrl || incomingContent) {
+        setActiveTab("ai");
+        if (incomingUrl) setAiUrl(incomingUrl);
+        if (incomingContent) setAiContent(incomingContent);
+        executeIngest(incomingUrl || "", incomingContent || "", incomingImg || "");
+      }
+    }
   }, []);
 
   // Handle Image Upload to Cloudflare R2
@@ -304,25 +347,7 @@ export default function AdminStudioPage() {
   // AI Ingestion Handler
   const handleAiIngest = async (e: React.FormEvent) => {
     e.preventDefault();
-    setAiLoading(true);
-    setAiError(null);
-    setAiResult(null);
-
-    try {
-      const res = await fetch("/api/admin/ingest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: aiUrl, content: aiContent }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Lỗi khi trích xuất");
-      setAiResult(data.extracted_item);
-    } catch (err: any) {
-      setAiError(err.message || "Đã xảy ra lỗi");
-    } finally {
-      setAiLoading(false);
-    }
+    await executeIngest(aiUrl, aiContent);
   };
 
   // Transfer AI Result to Manual Edit Form
@@ -1069,11 +1094,65 @@ export default function AdminStudioPage() {
             <div className="lg:col-span-6 bg-white/80 backdrop-blur-sm p-6 rounded-3xl border border-nep-ink/10 shadow-sm">
               <h2 className="font-heading text-lg font-bold text-nep-ink mb-1 flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-nep-red" />
-                <span>Trích xuất thông minh từ bài viết / website</span>
+                <span>Trích xuất thông minh từ Shopee / website / bài viết</span>
               </h2>
               <p className="text-xs text-nep-ink/60 mb-5">
-                Dán đường dẫn hoặc đoạn mô tả từ xưởng may, Gemini 2.5 Flash sẽ tự động nhận diện phom dáng, giá tiền và xuất thành thông tin có cấu trúc.
+                Dán đường dẫn sản phẩm Shopee hoặc bài viết xưởng may, Gemini 2.5 Flash sẽ tự động nhận diện phom dáng, giá tiền thật và xuất thành thông tin có cấu trúc.
               </p>
+
+              {/* SHOPEE BOOKMARKLET CARD */}
+              <div className="mb-6 p-4 rounded-2xl bg-amber-50/90 border border-amber-200/90 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🛍️</span>
+                    <span className="font-heading text-xs font-bold text-amber-950 uppercase tracking-wider">
+                      Shopee 1-Click Bookmarklet
+                    </span>
+                  </div>
+                  <span className="text-[10px] bg-amber-200/70 text-amber-900 px-2.5 py-0.5 rounded-full font-bold">
+                    Vượt Chặn Shopee 100%
+                  </span>
+                </div>
+                <p className="text-[11px] text-amber-900/80 leading-relaxed">
+                  Kéo nút màu cam dưới đây thả lên <strong>Thanh Dấu Trang (Bookmark Bar)</strong> của trình duyệt (Ctrl+Shift+B). Khi bạn đang xem sản phẩm trên Shopee, chỉ cần bấm vào Bookmark này là toàn bộ Tên, Giá, Ảnh và Mô tả sẽ tự động gửi về Nếp Việt!
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                  <a
+                    href="javascript:(function(){try{var u=window.location.href;var t=(document.querySelector('div.V3HquR')||document.querySelector('h1')||document.querySelector('title')||{}).innerText||document.title||'';var p=(document.querySelector('.pqTWkA')||document.querySelector('.G274Sr')||{}).innerText||'';var imgEl=document.querySelector('.Y5q01b img')||document.querySelector('meta[property=\'og:image\']');var img=imgEl?(imgEl.src||imgEl.content||''):'';var d=(document.querySelector('div.f7VU2S')||document.querySelector('.product-detail')||{}).innerText||'';var endpoint='http://localhost:3000/admin/ingest?source=bookmarklet&shopee_url='+encodeURIComponent(u)+'&content='+encodeURIComponent(t+(p?('\\nGiá: '+p):'')+(d?('\\n'+d.slice(0,1500)):''))+(img?('&image_url='+encodeURIComponent(img)):'');window.open(endpoint,'_blank');}catch(e){alert('Lỗi Bookmarklet: '+e.message);}})();"
+                    onClick={(e) => {
+                      alert('💡 Hướng dẫn: Bạn hãy KÉO THẢ nút này lên thanh Bookmark (Dấu trang) của trình duyệt. Sau đó khi lướt Shopee, chỉ cần bấm vào Bookmark là xong!');
+                    }}
+                    className="px-4 py-2 rounded-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 cursor-grab active:cursor-grabbing transition-transform select-none"
+                    title="Kéo nút này thả lên thanh Bookmark của trình duyệt"
+                  >
+                    <span>🛍️ Kéo Lên Bookmark: Lưu Vào Nếp Việt</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const code = "javascript:(function(){try{var u=window.location.href;var t=(document.querySelector('div.V3HquR')||document.querySelector('h1')||document.querySelector('title')||{}).innerText||document.title||'';var p=(document.querySelector('.pqTWkA')||document.querySelector('.G274Sr')||{}).innerText||'';var imgEl=document.querySelector('.Y5q01b img')||document.querySelector('meta[property=\\'og:image\\']');var img=imgEl?(imgEl.src||imgEl.content||''):'';var d=(document.querySelector('div.f7VU2S')||document.querySelector('.product-detail')||{}).innerText||'';var endpoint='http://localhost:3000/admin/ingest?source=bookmarklet&shopee_url='+encodeURIComponent(u)+'&content='+encodeURIComponent(t+(p?('\\nGiá: '+p):'')+(d?('\\n'+d.slice(0,1500)):''))+(img?('&image_url='+encodeURIComponent(img)):'');window.open(endpoint,'_blank');}catch(e){alert('Lỗi Bookmarklet: '+e.message);}})();";
+                      navigator.clipboard.writeText(code);
+                      setCopiedBookmarklet(true);
+                      setTimeout(() => setCopiedBookmarklet(false), 2500);
+                    }}
+                    className="px-3.5 py-2 rounded-full bg-white hover:bg-amber-50 text-amber-900 text-xs font-semibold border border-amber-300 transition-colors cursor-pointer flex items-center gap-1.5"
+                  >
+                    {copiedBookmarklet ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <span className="text-emerald-700 font-bold">Đã sao chép mã!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5 text-amber-800" />
+                        <span>Sao chép mã Javascript</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
 
               <form onSubmit={handleAiIngest} className="space-y-4">
                 <div>

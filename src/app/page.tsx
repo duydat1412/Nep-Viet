@@ -362,23 +362,57 @@ export default function Home() {
             </div>
           </div>
 
-          <nav className="hidden xl:flex items-center gap-1">
-            <a className="px-4 py-1.5 rounded-full bg-primary-container text-on-primary text-xs font-semibold shadow-xs" href="#">
-              Styling Studio
-            </a>
-            <a className="px-4 py-1.5 rounded-full text-xs font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#lookbook">
-              Lookbook Atelier
-            </a>
+          <nav className="hidden lg:flex items-center gap-1.5 bg-surface-container-low/90 p-1 rounded-full border border-nep-ink/10 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => {
+                setCreationMode("fitting");
+                const el = document.getElementById("studio-workspace");
+                el?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                creationMode === "fitting"
+                  ? "bg-primary-container text-on-primary shadow-xs"
+                  : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+              }`}
+            >
+              <Scissors className="w-3.5 h-3.5 text-nep-gold" />
+              <span>Ướm Thử Từng Part</span>
+              <span className="text-[10px] px-1.5 py-0.2 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Live</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setCreationMode("wizard");
+                const el = document.getElementById("studio-workspace");
+                el?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                creationMode === "wizard"
+                  ? "bg-primary-container text-on-primary shadow-xs"
+                  : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-nep-gold" />
+              <span>Thiết Kế Tạo Nhu Cầu</span>
+            </button>
+
+            <div className="w-px h-4 bg-nep-ink/10 mx-0.5" />
+
             <button
               onClick={() => { setFocusedSourceId(null); setCodexOpen(true); }}
               type="button"
-              className="px-4 py-1.5 rounded-full text-xs font-medium text-primary hover:bg-surface-container-high transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-primary hover:bg-surface-container-high transition-colors flex items-center gap-1 cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5" />
               <span>Điển Thư Khảo Cứu</span>
             </button>
-            <a className="px-4 py-1.5 rounded-full text-xs font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors" href="/admin/ingest">
-              Admin AI Ingest
+            <a 
+              className="px-3.5 py-1.5 rounded-full text-xs font-medium text-on-surface-variant hover:bg-surface-container-high transition-colors" 
+              href="/admin/ingest"
+            >
+              Admin Ingest
             </a>
           </nav>
 
@@ -452,44 +486,50 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-              <div className="lg:col-span-8">
+              <div className="lg:col-span-6">
                 <h1 className="font-heading text-4xl lg:text-5xl text-on-surface tracking-tight font-extrabold leading-tight">
-                  Nếp Áo Thời Gian <span className="italic font-normal text-secondary font-heading text-3xl lg:text-4xl">— AI Heritage Styling Studio</span>
+                  Nếp Áo Thời Gian <span className="italic font-normal text-secondary font-heading text-3xl lg:text-4xl">— Giám Tuyển Cổ Phục</span>
                 </h1>
                 <p className="text-sm lg:text-base text-on-surface-variant max-w-2xl mt-2 leading-relaxed">
-                  Khởi tạo phom dáng đương đại hoà quyện tinh hoa cung đình thế kỷ XVIII cùng đường may tối giản hiện đại. Hệ thống AI tính toán độ rủ tơ tằm, tỷ lệ nếp áo và bảng màu chuẩn mực.
+                  Lựa chọn ướm thử từng bộ phận từ album di sản hoặc điền form nhu cầu để AI tự động phối theo điển chế và bảng màu chuẩn mực.
                 </p>
               </div>
 
-              {/* Mode Switcher */}
-              <div className="lg:col-span-4 flex lg:justify-end">
-                <div className="inline-flex p-1 bg-surface-container-low rounded-full gap-1 shadow-sm border border-nep-ink/5">
+              {/* 2 Cách Tạo Lookbook: Ướm Thử Từng Part vs Thiết Kế Tạo Nhu Cầu */}
+              <div className="lg:col-span-6 flex lg:justify-end">
+                <div className="inline-flex p-1.5 bg-surface-container-low rounded-2xl gap-1.5 shadow-sm border border-nep-ink/10 w-full sm:w-auto">
                   <button 
-                    onClick={() => { setActiveMode("minimalist"); setOccasion("dao_pho"); handleGenerate("dao_pho"); }}
+                    onClick={() => {
+                      setCreationMode("fitting");
+                      const el = document.getElementById("studio-workspace");
+                      el?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     type="button"
-                    className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      activeMode === "minimalist" ? "bg-primary-container text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
+                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      creationMode === "fitting" 
+                        ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container" 
+                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
                     }`}
                   >
-                    Dạo Phố (Minimalist)
+                    <Scissors className="w-4 h-4 text-nep-gold" />
+                    <span>Cách 1: Chọn Từng Part (Ướm Thử)</span>
+                    <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Live 0ms</span>
                   </button>
                   <button 
-                    onClick={() => { setActiveMode("ceremonial"); setOccasion("di_le"); handleGenerate("di_le"); }}
+                    onClick={() => {
+                      setCreationMode("wizard");
+                      const el = document.getElementById("studio-workspace");
+                      el?.scrollIntoView({ behavior: "smooth" });
+                    }}
                     type="button"
-                    className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      activeMode === "ceremonial" ? "bg-primary-container text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
+                    className={`flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      creationMode === "wizard" 
+                        ? "bg-primary-container text-on-primary shadow-xs ring-1 ring-primary-container" 
+                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
                     }`}
                   >
-                    Đi Lễ / Viếng Chùa
-                  </button>
-                  <button 
-                    onClick={() => { setActiveMode("gala"); setOccasion("tet"); handleGenerate("tet"); }}
-                    type="button"
-                    className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                      activeMode === "gala" ? "bg-primary-container text-on-primary shadow-xs" : "text-on-surface-variant hover:text-on-surface"
-                    }`}
-                  >
-                    Lễ Tết &amp; Sự Kiện
+                    <Sparkles className="w-4 h-4 text-nep-gold" />
+                    <span>Cách 2: Thiết Kế Tạo Nhu Cầu (Điền Form)</span>
                   </button>
                 </div>
               </div>
@@ -501,7 +541,7 @@ export default function Home() {
           </header>
 
           {/* 3. MAIN SPLIT ATELIER GRID (Two Columns Layout) */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
+          <div id="studio-workspace" className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             
             {/* CỘT TRÁI: Interactive Styling Studio / Fitting Room (~58%) */}
             <section className="lg:col-span-7 flex flex-col gap-6">
@@ -519,7 +559,7 @@ export default function Home() {
                     }`}
                   >
                     <Scissors className="w-4 h-4 text-nep-gold" />
-                    <span>Ướm Thử Từng Món (Fitting Studio)</span>
+                    <span>Cách 1: Chọn Từng Part (Ướm Thử)</span>
                     <span className="text-[10px] px-1.5 py-0.5 bg-nep-gold/20 text-nep-gold rounded font-mono uppercase font-bold">Mới</span>
                   </button>
 
@@ -533,7 +573,7 @@ export default function Home() {
                     }`}
                   >
                     <Sparkles className="w-4 h-4 text-nep-gold" />
-                    <span>Trợ Lý AI Gợi Ý (AI Stylist 4 Bước)</span>
+                    <span>Cách 2: Thiết Kế Tạo Nhu Cầu (Điền Form AI)</span>
                   </button>
                 </div>
 
@@ -1062,10 +1102,30 @@ export default function Home() {
             </div>
 
             <div className="md:col-span-2 flex flex-col gap-1.5 text-xs">
-              <span className="uppercase tracking-wider font-bold text-on-surface mb-1 font-mono text-[11px]">Giám Tuyển</span>
-              <a href="#" className="text-on-surface-variant hover:text-primary transition-colors">Styling Studio</a>
-              <a href="#lookbook" className="text-on-surface-variant hover:text-primary transition-colors">Lookbook Mùa Thu</a>
-              <a href="/admin/ingest" className="text-on-surface-variant hover:text-primary transition-colors">Admin Ingestion</a>
+              <span className="uppercase tracking-wider font-bold text-on-surface mb-1 font-mono text-[11px]">Tạo Lookbook</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCreationMode("fitting");
+                  const el = document.getElementById("studio-workspace");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="text-left text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+              >
+                Ướm Thử Từng Part
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setCreationMode("wizard");
+                  const el = document.getElementById("studio-workspace");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="text-left text-on-surface-variant hover:text-primary transition-colors cursor-pointer"
+              >
+                Thiết Kế Tạo Nhu Cầu
+              </button>
+              <a href="/admin/ingest" className="text-on-surface-variant hover:text-primary transition-colors">Admin Ingest Sản Phẩm</a>
             </div>
 
             <div className="md:col-span-2 flex flex-col gap-1.5 text-xs">

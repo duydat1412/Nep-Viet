@@ -50,3 +50,4 @@ next-env.d.ts
 *.Photoroom.png
 *-Photoroom.png
 de_bai_audition_AIARENA.pdf
+public/uploads/

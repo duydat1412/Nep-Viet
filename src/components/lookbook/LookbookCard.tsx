@@ -99,10 +99,9 @@ export default function LookbookCard({ result, onOpenSource }: LookbookCardProps
         className="relative bg-nep-paper w-[360px] min-h-[690px] shadow-2xl overflow-hidden rounded-2xl border border-nep-ink/10 flex flex-col p-5 transition-all duration-300"
       >
         {/* Dấu Triện (Imperial Seal Stamp) Accent - Ước lệ mỹ thuật */}
-        <div className="absolute top-4 right-4 z-20 flex flex-col items-center select-none pointer-events-none" title="Mô phỏng đồ họa ấn triện truyền thống">
-          <div className="w-9 h-9 rounded-md bg-nep-red text-white flex flex-col items-center justify-center shadow-md leading-none border border-amber-300/40">
-            <span className="font-heading text-[8px] font-black tracking-widest uppercase">NẾP</span>
-            <span className="font-heading text-[8px] font-black tracking-widest uppercase mt-0.5">VIỆT</span>
+        <div className="absolute top-4 right-4 z-20 flex flex-col items-center select-none pointer-events-none" title="Ấn triện thương hiệu Nếp Việt">
+          <div className="w-10 h-10 drop-shadow-sm">
+            <img src="/favicon.png" alt="Nếp Việt Triện" className="w-full h-full object-contain" />
           </div>
           <span className="text-[7px] uppercase tracking-tighter text-nep-red font-mono mt-0.5 font-bold">NẾP PHÊ</span>
         </div>

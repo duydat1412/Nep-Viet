@@ -529,7 +529,12 @@ export default function AdminStudioPage() {
               <ArrowLeft className="w-4 h-4" />
             </a>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src="/favicon.png"
+                  alt="Nếp Việt"
+                  className="w-8 h-8 object-contain drop-shadow-xs"
+                />
                 <span className="font-heading font-extrabold text-2xl text-nep-red tracking-wide">
                   NẾP VIỆT
                 </span>

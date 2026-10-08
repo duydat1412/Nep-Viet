@@ -209,18 +209,21 @@ export default function Home() {
       {/* 1. TOP EDITORIAL APP HEADER */}
       <header className="fixed top-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(43,33,24,0.04)]">
         <div className="h-20 max-w-[1440px] mx-auto px-5 lg:px-10 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             {/* Seal Emblem */}
-            <div className="w-9 h-9 rounded-md bg-primary-container text-on-primary flex flex-col items-center justify-center shadow-sm select-none border border-amber-300/40">
-              <span className="font-heading text-[8px] font-black tracking-widest uppercase">NẾP</span>
-              <span className="font-heading text-[8px] font-black tracking-widest uppercase">VIỆT</span>
-            </div>
+            <a href="/" className="relative group block shrink-0">
+              <img 
+                src="/favicon.png" 
+                alt="Nếp Việt" 
+                className="w-11 h-11 object-contain drop-shadow-sm group-hover:scale-105 transition-transform"
+              />
+            </a>
             <div className="flex flex-col">
-              <a className="font-heading text-lg font-bold tracking-wider uppercase text-on-surface hover:text-primary transition-colors" href="#">
+              <a className="font-heading text-lg font-bold tracking-wider uppercase text-on-surface hover:text-primary transition-colors leading-tight" href="#">
                 NẾP VIỆT
               </a>
               <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-semibold">
-                AI Heritage Stylist · Hà Nội &amp; Sài Gòn
+                AI Heritage Stylist · Nét Riêng
               </span>
             </div>
           </div>
